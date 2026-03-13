@@ -1,7 +1,7 @@
 import api from './api';
 
 export const getConversations = async () => {
-  const response = await api.get('/api/conversations');   // ✅ added /api
+  const response = await api.get('/api/conversations');   // ✅ must have /api
   return response.data;
 };
 
