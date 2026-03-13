@@ -3,7 +3,6 @@ import axios from 'axios';
 // Direct backend URL from env, or fallback
 // Tip: Agar local hai to baseURL: 'http://localhost:5000/api' rakhein
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-
 const api = axios.create({
   baseURL: API_URL, // Yahan /api add kar diya taake niche files mein repeat na ho
   headers: {
