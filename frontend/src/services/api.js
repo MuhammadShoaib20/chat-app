@@ -3,8 +3,8 @@ import axios from 'axios';
 // Get API URL from environment or use appropriate default
 const API_URL = import.meta.env.VITE_API_URL || (
   import.meta.env.DEV 
-    ? 'http://localhost:5000/api'  // Development
-    : '/api'                         // Production (assumes backend at same domain)
+    ? 'http://localhost:5000/api'  // Development mode
+    : 'https://chat-app-14ut.onrender.com/api' // Production mode (Fix: Direct URL added)
 );
 
 const api = axios.create({

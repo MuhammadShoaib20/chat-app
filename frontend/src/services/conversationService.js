@@ -1,6 +1,7 @@
 import api from './api';
 
 export const getConversations = async () => {
+  // Request jayegi: https://chat-app-14ut.onrender.com/api/conversations
   const response = await api.get('/conversations');
   return response.data;
 };
