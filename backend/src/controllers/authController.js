@@ -8,14 +8,12 @@ const registerUser = async (req, res) => {
   try {
     const { username, email, password, avatar } = req.body;
 
-    // ✅ Validation
     if (!username || !email || !password) {
       return res.status(400).json({ 
         message: 'Username, email and password are required' 
       });
     }
 
-    // ✅ Check if user already exists
     const userExists = await User.findOne({ 
       $or: [
         { email: email.toLowerCase().trim() }, 
@@ -29,15 +27,14 @@ const registerUser = async (req, res) => {
       });
     }
 
-    // ✅ Create new user
+    // ✅ Create user – avatar defaults to empty string if not provided
     const user = await User.create({
       username: username.trim(),
       email: email.toLowerCase().trim(),
       password,
-      avatar: avatar || 'https://via.placeholder.com/150',
+      avatar: avatar || '', // 👈 changed from placeholder URL
     });
 
-    // ✅ Generate token
     const token = generateToken(user._id);
 
     res.status(201).json({
@@ -72,14 +69,12 @@ const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // ✅ Validation
     if (!email || !password) {
       return res.status(400).json({ 
         message: 'Email and password are required' 
       });
     }
 
-    // ✅ Find user
     const user = await User.findOne({ 
       email: email.toLowerCase().trim() 
     });
@@ -90,7 +85,6 @@ const loginUser = async (req, res) => {
       });
     }
 
-    // ✅ Check password
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.status(401).json({ 
@@ -98,11 +92,9 @@ const loginUser = async (req, res) => {
       });
     }
 
-    // ✅ Update lastSeen
     user.lastSeen = Date.now();
     await user.save();
 
-    // ✅ Generate token
     const token = generateToken(user._id);
 
     res.json({
