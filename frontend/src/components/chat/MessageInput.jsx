@@ -4,6 +4,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { uploadFile } from '../../services/uploadService';
 import Picker from '@emoji-mart/react';
 import data from '@emoji-mart/data';
+import toast from 'react-hot-toast'; // 👈 import toast
 
 const MessageInput = ({ onSend, conversationId, disabled }) => {
   const [message, setMessage] = useState('');
@@ -49,9 +50,10 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
       const { url, originalName } = await uploadFile(file);
       const isImage = file.type.startsWith('image/');
       onSend(isImage ? '🖼️ Image' : `📎 ${originalName}`, isImage ? 'image' : 'file', url);
+      toast.success('File uploaded successfully');
     } catch (error) {
       console.error('Upload failed:', error);
-      alert('Upload failed');
+      toast.error(error.response?.data?.message || 'Upload failed. Check console for details.');
     } finally {
       setUploading(false);
       e.target.value = '';
@@ -80,7 +82,7 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
 
   return (
     <div className="relative">
-      {/* Emoji Picker */}
+      {/* Emoji Picker (same as before) */}
       {showEmojiPicker && (
         <div className="absolute bottom-full left-2 mb-2 z-50 max-w-[90vw] sm:max-w-[350px]">
           <div className="shadow-xl rounded-lg">
@@ -96,7 +98,6 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
       )}
 
       <form onSubmit={handleSubmit} className="flex items-end gap-2">
-        {/* Hidden file input */}
         <input
           type="file"
           ref={fileInputRef}
@@ -105,7 +106,6 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
           disabled={disabled}
         />
 
-        {/* Upload button with SVG icon */}
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
@@ -125,7 +125,6 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
           )}
         </button>
 
-        {/* Emoji button */}
         <button
           type="button"
           onClick={() => setShowEmojiPicker(!showEmojiPicker)}
@@ -141,7 +140,6 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
           </svg>
         </button>
 
-        {/* Textarea with shadow */}
         <div className="flex-1 min-w-0 bg-gray-100 dark:bg-gray-700 rounded-2xl px-4 py-2 shadow-inner">
           <textarea
             ref={textareaRef}
@@ -155,7 +153,6 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
           />
         </div>
 
-        {/* Send button */}
         <button
           type="submit"
           disabled={!message.trim() || disabled || uploading}

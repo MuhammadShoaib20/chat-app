@@ -1,7 +1,7 @@
 const Conversation = require('../models/Conversation');
 const User = require('../models/User');
 const Message = require('../models/Message');
-const redisClient = require('../config/redis');
+const { redisClient } = require('../config/redis'); // ✅ FIXED: destructure
 
 // Helper to invalidate cache for participants
 const invalidateConversationCache = async (participants) => {
@@ -72,7 +72,6 @@ const createConversation = async (req, res) => {
       }
     }
 
-    // FIX: Separated participants.userId and participants array size check
     if (!isGroup && allIds.length === 2) {
       const existing = await Conversation.findOne({
         isGroup: false,

@@ -22,22 +22,18 @@ const subscribeUser = async () => {
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(import.meta.env.VITE_VAPID_PUBLIC_KEY),
     });
-    // Send to backend
-    await api.post('/users/subscribe', subscription.toJSON());
+    await api.post('/api/users/subscribe', subscription.toJSON()); // ✅ added /api
     console.log('Push subscription sent to server');
   } catch (error) {
     console.error('Failed to subscribe:', error);
   }
 };
 
-// Helper to convert VAPID key
 function urlBase64ToUint8Array(base64String) {
-  // Check if string exists
   if (!base64String) {
     console.error('VAPID Public Key is missing!');
     return new Uint8Array(0);
   }
-  
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
   const rawData = window.atob(base64);

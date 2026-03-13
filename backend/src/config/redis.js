@@ -1,53 +1,29 @@
-const redis = require('redis');
+const Redis = require('ioredis');
 
-let client = null;
+const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
 
-// Redis setup function
-const initRedis = async () => {
-  const url = process.env.REDIS_URL || 'redis://localhost:6379';
-  
-  client = redis.createClient({
-    url: url,
-    socket: {
-      reconnectStrategy: (retries) => {
-        if (retries > 10) return new Error('Redis reconnection failed');
-        return Math.min(retries * 50, 500); // Reconnect after small delay
-      }
-    }
-  });
+const pubClient = new Redis(redisUrl);
+const subClient = pubClient.duplicate();
 
-  client.on('error', (err) => console.error('Redis Client Error:', err.message));
-  client.on('connect', () => console.log('Redis Connecting...'));
-  client.on('ready', () => console.log('Redis Connected and Ready to use'));
+pubClient.on('connect', () => console.log('🔄 Redis PubClient connecting...'));
+pubClient.on('ready', () => console.log('✅ Redis PubClient ready'));
+pubClient.on('error', (err) => console.error('❌ Redis PubClient error:', err.message));
 
-  try {
-    await client.connect();
-  } catch (err) {
-    console.warn('Redis connection failed, working without cache:', err.message);
-    client = null;
-  }
-};
-
-// Start connection
-initRedis();
-
-// No-op for when Redis is down
-const noopMulti = () => ({
-  del() { return this; },
-  exec: async () => [],
-});
+subClient.on('connect', () => console.log('🔄 Redis SubClient connecting...'));
+subClient.on('ready', () => console.log('✅ Redis SubClient ready'));
+subClient.on('error', (err) => console.error('❌ Redis SubClient error:', err.message));
 
 const redisClient = {
-  // Check if client exists and is ready
   get isReady() {
-    return client && client.isReady;
+    return pubClient.status === 'ready';
   },
 
   async get(key) {
     if (!this.isReady) return null;
     try {
-      return await client.get(key);
-    } catch {
+      return await pubClient.get(key);
+    } catch (err) {
+      console.error('Redis get error:', err.message);
       return null;
     }
   },
@@ -55,7 +31,7 @@ const redisClient = {
   async setEx(key, ttl, value) {
     if (!this.isReady) return;
     try {
-      await client.setEx(key, ttl, value);
+      await pubClient.setex(key, ttl, value);
     } catch (err) {
       console.error('Redis setEx error:', err.message);
     }
@@ -64,16 +40,20 @@ const redisClient = {
   async del(key) {
     if (!this.isReady) return;
     try {
-      await client.del(key);
+      await pubClient.del(key);
     } catch (err) {
       console.error('Redis del error:', err.message);
     }
   },
 
   multi() {
-    if (!this.isReady) return noopMulti();
-    return client.multi();
+    if (!this.isReady) return { del() { return this; }, exec: async () => [] };
+    return pubClient.multi();
   },
 };
 
-module.exports = redisClient;
+module.exports = {
+  redisClient,
+  pubClient,
+  subClient,
+};

@@ -1,5 +1,7 @@
 const { Server } = require('socket.io');
 const jwt = require('jsonwebtoken');
+const { createAdapter } = require('@socket.io/redis-adapter');
+const { pubClient, subClient } = require('./redis');
 const User = require('../models/User');
 const Conversation = require('../models/Conversation');
 
@@ -10,6 +12,8 @@ const setupSocket = (server) => {
       credentials: true,
     },
   });
+
+  io.adapter(createAdapter(pubClient, subClient));
 
   // Authentication middleware
   io.use(async (socket, next) => {

@@ -1,6 +1,6 @@
 const User = require('../models/User');
 const PushSubscription = require('../models/PushSubscription');
-const redisClient = require('../config/redis');
+const { redisClient } = require('../config/redis'); // ✅ FIXED: destructure
 
 // @desc    Get current user profile
 // @route   GET /api/users/profile

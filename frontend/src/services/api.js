@@ -1,20 +1,18 @@
 import axios from 'axios';
 
-// Get API URL from environment or use appropriate default
 const API_URL = import.meta.env.VITE_API_URL || (
   import.meta.env.DEV 
-    ? 'http://localhost:5000/api'  // Development mode
-    : 'https://chat-app-14ut.onrender.com/api' // Production mode (Fix: Direct URL added)
+    ? 'http://localhost:5000'
+    : 'https://chat-app-14ut.onrender.com'
 );
 
 const api = axios.create({
   baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  // ✅ Remove the default Content-Type header – let Axios set it automatically
+  // headers: { 'Content-Type': 'application/json' }, // ❌ removed
 });
 
-// Request interceptor to add token to headers
+// Request interceptor to add token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -26,7 +24,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor: 401 → clear token and redirect to login
+// Response interceptor for 401 handling
 api.interceptors.response.use(
   (response) => response,
   (error) => {

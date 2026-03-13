@@ -1,21 +1,21 @@
 import api from './api';
 
 export const searchUsers = async (query) => {
-  const response = await api.get(`/users/search?q=${encodeURIComponent(query)}`);
+  const response = await api.get(`/api/users/search?q=${encodeURIComponent(query)}`); // ✅ added /api
   return response.data;
 };
 
 export const getBlockStatus = async (userId) => {
-  const response = await api.get(`/users/block-status/${userId}`);
-  return response.data; // { hasBlocked, isBlockedBy }
+  const response = await api.get(`/api/users/block-status/${userId}`); // ✅ added /api
+  return response.data;
 };
 
 export const blockUser = async (userId) => {
-  const response = await api.post(`/users/block/${userId}`);
+  const response = await api.post(`/api/users/block/${userId}`); // ✅ added /api
   return response.data;
 };
 
 export const unblockUser = async (userId) => {
-  const response = await api.post(`/users/unblock/${userId}`);
+  const response = await api.post(`/api/users/unblock/${userId}`); // ✅ added /api
   return response.data;
 };
