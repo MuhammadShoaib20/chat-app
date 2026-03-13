@@ -23,7 +23,7 @@ const subscribeUser = async () => {
       applicationServerKey: urlBase64ToUint8Array(import.meta.env.VITE_VAPID_PUBLIC_KEY),
     });
     // Send to backend
-    await api.post('/api/users/subscribe', subscription.toJSON());
+    await api.post('/users/subscribe', subscription.toJSON());
     console.log('Push subscription sent to server');
   } catch (error) {
     console.error('Failed to subscribe:', error);
