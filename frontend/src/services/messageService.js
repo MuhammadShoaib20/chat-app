@@ -11,7 +11,6 @@ export const sendMessage = async (data) => {
 };
 
 export const markAsRead = async ({ conversationId, messageIds }) => {
-  // ✅ FIX: add /api
   const response = await api.post('/api/messages/read', { conversationId, messageIds });
   return response.data;
 };

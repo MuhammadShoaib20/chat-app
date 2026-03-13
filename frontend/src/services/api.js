@@ -8,11 +8,9 @@ const API_URL = import.meta.env.VITE_API_URL || (
 
 const api = axios.create({
   baseURL: API_URL,
-  // ✅ Remove the default Content-Type header – let Axios set it automatically
-  // headers: { 'Content-Type': 'application/json' }, // ❌ removed
+  // ✅ No default Content-Type – Axios sets it automatically for FormData
 });
 
-// Request interceptor to add token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -24,7 +22,6 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor for 401 handling
 api.interceptors.response.use(
   (response) => response,
   (error) => {

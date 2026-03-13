@@ -10,7 +10,7 @@ export default defineConfig({
   resolve: {
     alias: {
       process: 'process/browser',      // polyfill process
-      buffer: 'buffer',                 // polyfill buffer (optional)
+      buffer: 'buffer',                 // polyfill buffer
     },
   },
 })
