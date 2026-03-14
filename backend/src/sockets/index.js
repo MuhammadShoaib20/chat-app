@@ -56,10 +56,11 @@ module.exports = (io, socket) => {
         content, type, mediaUrl
       });
 
+      // ✅ FIXED: Use returnDocument: 'after' instead of new: true
       const updatedConv = await Conversation.findByIdAndUpdate(
         conversationId,
         { lastMessage: message._id, updatedAt: Date.now() },
-        { new: true }
+        { returnDocument: 'after' } // 👈 changed from { new: true }
       ).populate('participants.userId', 'username avatar');
 
       const populated = await message.populate('sender', 'username avatar');
@@ -121,10 +122,9 @@ module.exports = (io, socket) => {
     }
   });
 
-  // ✅ Reaction socket event – fixed: removed unused fallback
   socket.on('add-reaction', async ({ messageId, emoji }) => {
     try {
-      const currentUserId = socket.user?._id;   // ✅ now only uses socket.user._id
+      const currentUserId = socket.user?._id;
       if (!currentUserId) {
         console.error('Socket add-reaction error: User not authenticated');
         return;
