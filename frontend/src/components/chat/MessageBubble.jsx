@@ -45,7 +45,8 @@ const MessageBubble = ({ message, isOwn, onEdit, onDelete, onAddReaction }) => {
   const renderContent = () => {
     if (message.type === 'deleted') {
       return (
-        <div className="italic text-gray-500 dark:text-gray-400 text-xs py-0.5">
+        <div className="flex items-center gap-2 italic text-gray-400 dark:text-gray-500 text-xs py-1">
+          <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
           This message was deleted
         </div>
       );
@@ -53,27 +54,18 @@ const MessageBubble = ({ message, isOwn, onEdit, onDelete, onAddReaction }) => {
 
     if (isEditing) {
       return (
-        <form onSubmit={handleEditSubmit} className="flex items-center gap-1">
-          <input
-            type="text"
+        <form onSubmit={handleEditSubmit} className="flex flex-col gap-2 min-w-[200px]">
+          <textarea
             value={editText}
             onChange={(e) => setEditText(e.target.value)}
-            className="flex-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1 text-xs text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full bg-white/20 dark:bg-gray-900/40 border border-white/30 dark:border-gray-600 rounded-xl px-3 py-2 text-sm text-inherit focus:outline-none focus:ring-2 focus:ring-white/50 resize-none"
+            rows="2"
             autoFocus
           />
-          <button
-            type="submit"
-            className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded-lg transition-colors"
-          >
-            Save
-          </button>
-          <button
-            type="button"
-            onClick={() => setIsEditing(false)}
-            className="text-xs bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-800 dark:text-white px-2 py-1 rounded-lg transition-colors"
-          >
-            Cancel
-          </button>
+          <div className="flex justify-end gap-2">
+            <button type="button" onClick={() => setIsEditing(false)} className="text-[10px] font-bold uppercase tracking-wider opacity-80 hover:opacity-100">Cancel</button>
+            <button type="submit" className="bg-white text-blue-600 dark:bg-blue-500 dark:text-white px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider shadow-md active:scale-95 transition-all">Save</button>
+          </div>
         </form>
       );
     }
@@ -81,16 +73,16 @@ const MessageBubble = ({ message, isOwn, onEdit, onDelete, onAddReaction }) => {
     switch (message.type) {
       case 'image':
         return (
-          <div className="relative">
+          <div className="relative group/img overflow-hidden rounded-xl border border-black/5 dark:border-white/5">
             {!imageLoaded && (
-              <div className="w-full h-24 bg-gray-200 dark:bg-gray-700 animate-pulse rounded-lg" />
+              <div className="w-full h-48 bg-gray-200 dark:bg-gray-700 animate-pulse flex items-center justify-center">
+                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+              </div>
             )}
             <img
               src={message.mediaUrl}
               alt="Shared image"
-              className={`max-w-full max-h-48 rounded-lg cursor-pointer transition-opacity duration-200 ${
-                imageLoaded ? 'opacity-100' : 'opacity-0'
-              }`}
+              className={`max-w-full max-h-72 object-cover cursor-pointer hover:scale-[1.02] transition-all duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
               onLoad={() => setImageLoaded(true)}
               onClick={() => window.open(message.mediaUrl, '_blank')}
               loading="lazy"
@@ -99,146 +91,138 @@ const MessageBubble = ({ message, isOwn, onEdit, onDelete, onAddReaction }) => {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleDownload(message.mediaUrl, `image-${Date.now()}.jpg`);
+                  handleDownload(message.mediaUrl, `img-${Date.now()}.jpg`);
                 }}
-                className="absolute bottom-1 right-1 bg-black/50 hover:bg-black/70 text-white text-xs px-1.5 py-0.5 rounded-full backdrop-blur-sm transition-colors"
-                title="Download"
+                className="absolute top-2 right-2 bg-black/40 hover:bg-black/60 text-white p-2 rounded-xl backdrop-blur-md opacity-0 group-hover/img:opacity-100 transition-all duration-200 shadow-lg"
               >
-                ⬇️
+                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
               </button>
             )}
           </div>
         );
       case 'file':
         return (
-          <div className="flex items-center gap-2 p-1.5 bg-gray-100 dark:bg-gray-700 rounded-lg">
-            <span className="text-xl">📎</span>
+          <div className={`flex items-center gap-3 p-3 rounded-xl border ${isOwn ? 'bg-white/10 border-white/20' : 'bg-gray-50 dark:bg-gray-900/50 border-gray-100 dark:border-gray-700'}`}>
+            <div className={`w-10 h-10 rounded-lg flex items-center justify-center shadow-sm ${isOwn ? 'bg-white text-blue-600' : 'bg-blue-600 text-white'}`}>
+              <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+            </div>
             <div className="flex-1 min-w-0">
               <button
                 onClick={() => {
                   const filename = message.content?.replace(/[^a-z0-9.]/gi, '_') || 'file';
                   handleDownload(message.mediaUrl, filename);
                 }}
-                className="text-blue-600 dark:text-blue-400 hover:underline text-left break-all text-xs font-medium"
+                className={`text-sm font-bold truncate block w-full text-left hover:underline ${isOwn ? 'text-white' : 'text-blue-600 dark:text-blue-400'}`}
               >
-                {message.content || 'Download file'}
+                {message.content || 'Attached File'}
               </button>
-              <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
-                {message.content?.startsWith('📎') ? message.content.slice(2) : 'File'}
+              <p className={`text-[10px] uppercase font-black tracking-widest mt-0.5 opacity-60 ${isOwn ? 'text-blue-100' : 'text-gray-500'}`}>
+                {message.mediaUrl?.split('.').pop() || 'FILE'}
               </p>
             </div>
           </div>
         );
       default:
         return (
-          <div className="break-words whitespace-pre-wrap text-xs sm:text-sm">
+          <p className="leading-relaxed text-sm sm:text-[15px] font-medium tracking-tight">
             {message.content}
-          </div>
+          </p>
         );
     }
   };
 
   return (
-    <div
-      className={`flex ${isOwn ? 'justify-end' : 'justify-start'} group`}
-    >
-      <div className={`relative max-w-[75%] sm:max-w-[65%] ${isOwn ? 'order-2' : 'order-1'}`}>
-        {/* Sender name (only for groups) */}
+    <div className={`flex w-full mb-4 ${isOwn ? 'justify-end' : 'justify-start'} group`}>
+      <div className={`relative flex flex-col max-w-[85%] sm:max-w-[70%] ${isOwn ? 'items-end' : 'items-start'}`}>
+        
+        {/* Sender Label */}
         {!isOwn && message.sender?.username && (
-          <div className="text-[10px] font-semibold text-gray-600 dark:text-gray-400 mb-0.5 ml-1">
+          <span className="text-[11px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-500 mb-1 ml-2">
             {message.sender.username}
-          </div>
+          </span>
         )}
 
-        {/* Message bubble */}
-        <div
-          className={`
-            p-2 rounded-lg shadow-sm break-words
-            ${
-              isOwn
-                ? 'bg-blue-500   text-white rounded-br-none'
-                : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-bl-none'
-            }
-          `}
-        >
-          {renderContent()}
+        {/* Bubble Container */}
+        <div className="relative flex items-center gap-2 group">
+          
+          <div
+            className={`
+              relative px-4 py-3 rounded-[1.5rem] shadow-sm transition-all duration-300
+              ${isOwn 
+                ? 'bg-gradient-to-br from-blue-600 to-blue-500 text-white rounded-tr-none border-b border-blue-400 shadow-blue-500/10' 
+                : 'bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white rounded-tl-none shadow-black/5'
+              }
+            `}
+          >
+            {renderContent()}
 
-          {/* Timestamp and read receipt */}
-          <div className="flex items-center justify-end gap-1 mt-0.5 text-[8px] sm:text-[10px] opacity-70">
-            <span>
-              {formatDistanceToNow(new Date(message.createdAt), { addSuffix: true })}
-            </span>
-            {message.edited && <span className="ml-1 italic">(edited)</span>}
-            {isOwn && (
-              <span className="ml-1">
-                {message.readBy?.length ? '✓✓' : '✓'}
-              </span>
-            )}
+            {/* Meta Info */}
+            <div className={`flex items-center gap-1.5 mt-1.5 text-[9px] font-bold uppercase tracking-tighter opacity-60 ${isOwn ? 'justify-end' : 'justify-start'}`}>
+              <span>{formatDistanceToNow(new Date(message.createdAt), { addSuffix: false })}</span>
+              {message.edited && <span className="italic font-black text-blue-200">• Edited</span>}
+              {isOwn && (
+                <span className={`text-[12px] ${message.readBy?.length ? 'text-blue-200' : 'text-white/60'}`}>
+                  {message.readBy?.length ? '◈◈' : '◈'}
+                </span>
+              )}
+            </div>
           </div>
+
+          {/* Inline Action Buttons (Hover) */}
+          {!isEditing && message.type !== 'deleted' && (
+            <div className={`flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200 transform ${isOwn ? 'flex-row-reverse -translate-x-2' : 'translate-x-2'}`}>
+              <button
+                onClick={() => setShowPicker(!showPicker)}
+                className="w-8 h-8 bg-white dark:bg-gray-800 rounded-full shadow-xl border border-gray-100 dark:border-gray-700 flex items-center justify-center hover:scale-110 active:scale-90 transition-all"
+              >
+                <span className="text-sm">😊</span>
+              </button>
+              {isOwn && (
+                <div className="bg-white dark:bg-gray-800 rounded-full shadow-xl border border-gray-100 dark:border-gray-700">
+                  <MessageActions
+                    onEdit={() => setIsEditing(true)}
+                    onDelete={() => onDelete(message._id)}
+                    isOwn={isOwn}
+                  />
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
-        {/* Reactions */}
+        {/* Reaction Bar */}
         {Object.keys(reactionCounts).length > 0 && (
-          <div className="flex flex-wrap gap-0.5 mt-0.5 justify-end">
+          <div className={`flex flex-wrap gap-1 mt-1.5 ${isOwn ? 'justify-end' : 'justify-start'}`}>
             {Object.entries(reactionCounts).map(([emoji, count]) => (
               <button
                 key={emoji}
                 onClick={() => onAddReaction(message._id, emoji)}
-                className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 rounded-full text-xs hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                className="flex items-center gap-1 px-2 py-0.5 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-700 rounded-full text-xs shadow-sm hover:border-blue-400 transition-all transform hover:scale-105 active:scale-95"
               >
-                {emoji} {count}
+                <span>{emoji}</span>
+                <span className="font-black text-[10px] text-gray-500">{count}</span>
               </button>
             ))}
           </div>
         )}
 
-        {/* Action buttons */}
-        {!isEditing && message.type !== 'deleted' && (
-          <div
-            className={`
-              absolute bottom-0 ${isOwn ? 'left-0 -translate-x-full pl-1' : 'right-0 translate-x-full pr-1'}
-              flex items-center gap-0.5
-              md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200
-            `}
-          >
-            <button
-              onClick={() => setShowPicker(!showPicker)}
-              className="w-6 h-6 bg-white dark:bg-gray-800 rounded-full shadow-md flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700"
-              title="Add reaction"
-            >
-              <span className="text-xs">😊</span>
-            </button>
-
-            {isOwn && (
-              <MessageActions
-                onEdit={() => setIsEditing(true)}
-                onDelete={() => onDelete(message._id)}
-                isOwn={isOwn}
-              />
-            )}
-          </div>
-        )}
-
-        {/* Emoji picker */}
+        {/* Emoji Picker Modal */}
         {showPicker && (
-          <div
-            className={`
-              absolute bottom-full mb-1 z-50
-              ${isOwn ? 'right-0' : 'left-0'}
-              max-w-[90vw] sm:max-w-[300px]
-            `}
-          >
-            <Picker
-              data={data}
-              onEmojiSelect={(emoji) => {
-                onAddReaction(message._id, emoji.native);
-                setShowPicker(false);
-              }}
-              theme="light"
-              previewPosition="none"
-              skinTonePosition="none"
-              className="rounded-lg shadow-xl scale-75 sm:scale-90 origin-bottom-right"
-            />
+          <div className={`absolute bottom-full mb-3 z-[60] shadow-2xl animate-in fade-in zoom-in-95 duration-200 ${isOwn ? 'right-0' : 'left-0'}`}>
+            <div className="relative">
+              <div className="absolute inset-0 bg-blue-500/10 blur-xl rounded-3xl" />
+              <Picker
+                data={data}
+                onEmojiSelect={(emoji) => {
+                  onAddReaction(message._id, emoji.native);
+                  setShowPicker(false);
+                }}
+                theme="auto"
+                previewPosition="none"
+                skinTonePosition="none"
+              />
+            </div>
+            <div className="fixed inset-0 z-[-1]" onClick={() => setShowPicker(false)} />
           </div>
         )}
       </div>
