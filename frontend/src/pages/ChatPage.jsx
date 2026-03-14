@@ -1,11 +1,8 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom"; // added import
+import { Link } from "react-router-dom";
 import ConversationList from "../components/chat/ConversationList";
 import ChatWindow from "../components/chat/ChatWindow";
-import CallModal from "../components/chat/CallModal";
 import GroupInfoPanel from "../components/chat/GroupInfoPanel";
-import useCall from "../hooks/useCall";
-import { useAuth } from "../hooks/useAuth";
 import { useSocket } from "../hooks/useSocket";
 
 const ChatPage = () => {
@@ -13,31 +10,12 @@ const ChatPage = () => {
   const [selectedConv, setSelectedConv] = useState(null);
   const [showInfoPanel, setShowInfoPanel] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
-  const { user } = useAuth();
   const { socket } = useSocket();
-
-  const {
-    startCall,
-    answerCall,
-    rejectCall,
-    endCall,
-    callState,
-    localStream,
-    remoteStream,
-  } = useCall();
 
   const handleSelectConversation = (id, conv) => {
     setSelectedId(id);
     setSelectedConv(conv);
     setShowSidebar(false);
-  };
-
-  const handleInitiateCall = (type) => {
-    if (!selectedConv || selectedConv.isGroup) return;
-    const target = selectedConv.participants.find(
-      (p) => p.userId._id !== user._id,
-    );
-    if (target) startCall(target.userId._id, type);
   };
 
   useEffect(() => {
@@ -105,7 +83,7 @@ const ChatPage = () => {
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
-                  className="text-blue-600 dark:text-blue-400" // ← light blue color added
+                  className="text-blue-600 dark:text-blue-400"
                 >
                   <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
@@ -115,7 +93,7 @@ const ChatPage = () => {
               </h2>
             </div>
             <div className="flex items-center gap-2">
-              {/* Desktop close button - hidden on mobile */}
+              {/* Desktop close button */}
               <button
                 onClick={() => setShowSidebar(false)}
                 className="hidden lg:block text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 p-1 rounded-full transition-colors"
@@ -132,7 +110,7 @@ const ChatPage = () => {
                   <path d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
-              {/* Mobile close button (existing) */}
+              {/* Mobile close button */}
               <button
                 onClick={() => setShowSidebar(false)}
                 className="lg:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 p-1 rounded-full transition-colors"
@@ -160,7 +138,7 @@ const ChatPage = () => {
         </div>
       </aside>
 
-      {/* Floating button when sidebar closed on desktop - now smaller, top-left, with hamburger icon */}
+      {/* Floating button when sidebar closed on desktop */}
       {!showSidebar && (
         <button
           onClick={() => setShowSidebar(true)}
@@ -181,7 +159,7 @@ const ChatPage = () => {
         </button>
       )}
 
-      {/* Main area - adjusts margin based on sidebar state on desktop */}
+      {/* Main area */}
       <main
         className={`
           flex-1 flex flex-col min-w-0 bg-gray-100 dark:bg-gray-950
@@ -195,8 +173,8 @@ const ChatPage = () => {
               <ChatWindow
                 conversationId={selectedId}
                 conversation={selectedConv}
-                onStartCall={handleInitiateCall}
                 onOpenInfo={() => setShowInfoPanel(true)}
+                onOpenSidebar={() => setShowSidebar(false)}
               />
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center space-y-4 p-8 text-center">
@@ -236,20 +214,6 @@ const ChatPage = () => {
             />
           </div>
         </>
-      )}
-
-      {/* Call Modal */}
-      {callState.status !== "idle" && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <CallModal
-            callState={callState}
-            localStream={localStream}
-            remoteStream={remoteStream}
-            onAnswer={answerCall}
-            onReject={rejectCall}
-            onEnd={endCall}
-          />
-        </div>
       )}
     </div>
   );

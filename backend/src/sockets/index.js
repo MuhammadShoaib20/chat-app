@@ -3,8 +3,6 @@ const Conversation = require('../models/Conversation');
 const User = require('../models/User');
 const { sendPushNotification } = require('../utils/notificationHelper');
 
-const activeCalls = new Map();
-
 module.exports = (io, socket) => {
   if (socket.user?._id) {
     socket.join(`user:${socket.user._id}`);
@@ -56,11 +54,10 @@ module.exports = (io, socket) => {
         content, type, mediaUrl
       });
 
-      // ✅ FIXED: Use returnDocument: 'after' instead of new: true
       const updatedConv = await Conversation.findByIdAndUpdate(
         conversationId,
         { lastMessage: message._id, updatedAt: Date.now() },
-        { returnDocument: 'after' } // 👈 changed from { new: true }
+        { returnDocument: 'after' }
       ).populate('participants.userId', 'username avatar');
 
       const populated = await message.populate('sender', 'username avatar');
@@ -155,50 +152,5 @@ module.exports = (io, socket) => {
     }
   });
 
-  socket.on('call-user', (data) => {
-    const { targetUserId, offer, callType } = data;
-    const callId = `call_${socket.user._id}_${Date.now()}`;
-    activeCalls.set(callId, { callerId: socket.user._id, targetUserId, status: 'ringing' });
-    socket.emit('call-created', { callId, targetUserId, callType });
-    io.to(`user:${targetUserId}`).emit('incoming-call', {
-      callId,
-      callerId: socket.user._id,
-      callerName: socket.user.username,
-      callType,
-      offer,
-    });
-  });
-
-  socket.on('answer-call', (data) => {
-    const { callId, answer, targetUserId } = data;
-    if (activeCalls.has(callId)) activeCalls.get(callId).status = 'connected';
-    io.to(`user:${targetUserId}`).emit('call-answered', { callId, answer });
-  });
-
-  socket.on('ice-candidate', (data) => {
-    const { candidate, targetUserId } = data;
-    io.to(`user:${targetUserId}`).emit('ice-candidate', { candidate, from: socket.user._id });
-  });
-
-  socket.on('end-call', (data) => {
-    const { callId, targetUserId } = data;
-    activeCalls.delete(callId);
-    io.to(`user:${targetUserId}`).emit('call-ended', { callId });
-  });
-
-  socket.on('reject-call', (data) => {
-    const { callId, targetUserId } = data;
-    activeCalls.delete(callId);
-    io.to(`user:${targetUserId}`).emit('call-rejected', { callId });
-  });
-
-  socket.on('disconnect', () => {
-    activeCalls.forEach((call, callId) => {
-      if (call.callerId === socket.user._id || call.targetUserId === socket.user._id) {
-        const target = call.callerId === socket.user._id ? call.targetUserId : call.callerId;
-        io.to(`user:${target}`).emit('call-ended', { callId });
-        activeCalls.delete(callId);
-      }
-    });
-  });
+  // ❌ All call-related events removed
 };

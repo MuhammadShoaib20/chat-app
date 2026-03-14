@@ -21,7 +21,6 @@ const formatDateHeader = (date) => {
 const ChatWindow = ({
   conversationId,
   conversation,
-  onStartCall,
   onOpenInfo,
   onOpenSidebar, // for mobile back button
 }) => {
@@ -198,7 +197,7 @@ const ChatWindow = ({
 
   return (
     <div className="flex flex-col h-full bg-white dark:bg-gray-900 overflow-hidden">
-      {/* Header – refined with subtle shadow */}
+      {/* Header */}
       <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700 gap-2 flex-wrap bg-white dark:bg-gray-900 sticky top-0 z-10 shadow-sm">
         <div className="flex items-center min-w-0 flex-1">
           {onOpenSidebar && (
@@ -224,7 +223,7 @@ const ChatWindow = ({
           </div>
         </div>
 
-        {/* Action buttons – smoother hover */}
+        {/* Action buttons */}
         <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
           <button
             onClick={() => setShowSearch(!showSearch)}
@@ -257,20 +256,7 @@ const ChatWindow = ({
               >
                 {blockStatus.hasBlocked ? '🚫' : '⛔'}
               </button>
-              <button
-                onClick={() => onStartCall?.('audio')}
-                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 text-gray-600 dark:text-gray-300 active:scale-95"
-                title="Audio call"
-              >
-                📞
-              </button>
-              <button
-                onClick={() => onStartCall?.('video')}
-                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 text-gray-600 dark:text-gray-300 active:scale-95"
-                title="Video call"
-              >
-                📹
-              </button>
+              {/* ❌ Call buttons removed */}
             </>
           )}
 
@@ -286,7 +272,7 @@ const ChatWindow = ({
         </div>
       </div>
 
-      {/* Search bar – compact and clean */}
+      {/* Search bar */}
       {showSearch && (
         <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-sm">
           <div className="relative">
@@ -321,7 +307,6 @@ const ChatWindow = ({
                   key={msg._id}
                   className="p-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
                   onClick={() => {
-                    // Optional: scroll to message
                     setShowSearch(false);
                   }}
                 >
@@ -334,20 +319,18 @@ const ChatWindow = ({
         </div>
       )}
 
-      {/* Messages Area – clean background, smooth scrolling */}
+      {/* Messages Area */}
       <div
         ref={messagesContainerRef}
         className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900"
         style={{ scrollBehavior: 'smooth' }}
       >
         {loadingInitial ? (
-          // Skeleton loader – refined
           <div className="space-y-4 p-4">
             <Skeleton count={5} height={60} className="mb-2 rounded-lg" />
           </div>
         ) : (
           <>
-            {/* Load older messages button – pill with micro‑interaction */}
             {hasMore && (
               <div className="flex justify-center sticky top-2 z-10">
                 <button
@@ -370,7 +353,6 @@ const ChatWindow = ({
               </div>
             )}
 
-            {/* Messages with date separators – minimal */}
             {messagesWithDateHeaders.map((item, index) => {
               if (item.type === 'date') {
                 return (
@@ -395,7 +377,6 @@ const ChatWindow = ({
               );
             })}
 
-            {/* Typing indicator – sleek animation */}
             {typingUsers.length > 0 && (
               <div className="flex items-center space-x-2 text-gray-500 dark:text-gray-400 px-2 py-1">
                 <div className="flex space-x-1">
@@ -413,7 +394,7 @@ const ChatWindow = ({
         )}
       </div>
 
-      {/* Input Area – clean separator */}
+      {/* Input Area */}
       <div className="p-3 sm:p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
         <MessageInput
           conversationId={conversationId}
