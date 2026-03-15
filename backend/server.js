@@ -1,113 +1,84 @@
-import express from "express";
-import dotenv from "dotenv";
-import cors from "cors";
+const express = require('express');
+const http = require('http');
+const path = require('path');
+const dotenv = require('dotenv');
+const cors = require('cors');
+const helmet = require('helmet');
+const connectDB = require('./src/config/db');
+const setupSocket = require('./src/config/socket');
+const { notFound, errorHandler } = require('./src/middleware/errorMiddleware');
+const { apiLimiter, authLimiter, messageLimiter } = require('./src/middleware/rateLimiter');
 
-import connectDB from "./config/db.js";
-import connectCloudinary from "./config/cloudinary.js";
-
-import authRoutes from "./routes/authRoutes.js";
-import productRoutes from "./routes/productRoutes.js";
-import orderRoutes from "./routes/orderRoutes.js";
-import paymentRoutes from "./routes/paymentRoutes.js";
-import newsletterRoutes from "./routes/newsletterRoutes.js";
-import contactRoutes from "./routes/contactRoutes.js";
-
-// Load ENV first
 dotenv.config();
-
-// Initialize app
-const app = express();
-
-// Database & Cloudinary Connections
 connectDB();
-connectCloudinary();
 
-// --- CORS CONFIGURATION (STABLE & DYNAMIC) ---
-const allowedOriginsEnv = process.env.ALLOWED_ORIGINS;
-const devLocalOrigins = ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'];
+const app = express();
+app.set("trust proxy", 1);
+const server = http.createServer(app);
 
-let allowedOrigins = [];
+// Socket.io setup
+const io = setupSocket(server);
+app.set('io', io);
 
-if (allowedOriginsEnv) {
-  const envOrigins = allowedOriginsEnv.split(',').map(origin => origin.trim());
-  allowedOrigins = [...envOrigins, ...devLocalOrigins];
-} else {
-  const frontendUrl = process.env.FRONTEND_URL;
-  allowedOrigins = [frontendUrl, ...devLocalOrigins].filter(Boolean);
-}
+// Middleware
+app.use(helmet({
+  crossOriginResourcePolicy: false,
+}));
 
-allowedOrigins = [...new Set(allowedOrigins)];
-
-// Vercel subdomains ko handle karne ke liye Regex
-const vercelRegex = /\.vercel\.app$/;
-
-console.log('✅ Allowed CORS origins:', allowedOrigins);
-
-app.use(cors({
-  origin: function (origin, callback) {
-    // 1. Allow requests with no origin (Postman, etc.)
-    if (!origin) return callback(null, true);
-
-    // 2. Check if origin is in the allowed list OR matches Vercel pattern
-    const isAllowed = allowedOrigins.includes(origin) || vercelRegex.test(origin);
-
-    if (isAllowed) {
+const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173').split(',').map(s => s.trim());
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin) || /^https?:\/\/localhost(:\d+)?$/.test(origin)) {
       callback(null, true);
     } else {
-      console.log("❌ CORS blocked request from origin:", origin);
-      callback(new Error('Not allowed by CORS'));
+      callback(null, true);
     }
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-// --- END CORS ---
+};
+app.use(cors(corsOptions));
 
-// Body parser with raw body for webhook verification
-app.use(express.json({
-  limit: '50mb',
-  verify: (req, res, buf) => {
-    req.rawBody = buf;
-  }
-}));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
-// Routes
-app.use("/api/auth", authRoutes);
-app.use("/api", productRoutes);
-app.use("/api", orderRoutes);
-app.use("/api", paymentRoutes);
-app.use("/api", newsletterRoutes);
-app.use("/api", contactRoutes);
+// Serving static files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Root Route
-app.get("/", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "🚀 ShopHub API Running Successfully",
+// Rate limiting
+app.use('/api', apiLimiter);
+app.use('/api/auth', authLimiter);
+app.use('/api/messages', messageLimiter);
+
+app.use('/api/test', require('./src/routes/testRoutes'));
+app.use('/api/auth', require('./src/routes/authRoutes'));
+app.use('/api/users', require('./src/routes/userRoutes'));
+app.use('/api/conversations', require('./src/routes/conversationRoutes'));
+app.use('/api/messages', require('./src/routes/messageRoutes'));
+app.use('/api/upload', require('./src/routes/uploadRoutes'));
+
+// ✅ Health check endpoint
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'Chat API is running...',
+    version: '1.0',
+    status: 'OK'
   });
 });
 
-// 404 Handler
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: "API Route Not Found",
+// ✅ API status check
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    message: 'API is healthy',
+    timestamp: new Date().toISOString()
   });
 });
 
-// Global Error Handler
-app.use((err, req, res, next) => {
-  console.error(err);
-  res.status(err.statusCode || 500).json({
-    success: false,
-    message: err.message || "Internal Server Error",
-  });
-});
+// Error handling middleware
+app.use(notFound);
+app.use(errorHandler);
 
-// Start Server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+const PORT = 5000;
+server.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });
