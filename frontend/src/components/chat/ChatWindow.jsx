@@ -232,7 +232,7 @@ const ChatWindow = ({
         <div className="flex items-center gap-1 sm:gap-2">
           <button
             onClick={() => setShowSearch(!showSearch)}
-            className={`p-2.5 max-sm:p-2 rounded-xl transition-all active:scale-90 ${
+            className={` mt-4 p-2.5 max-sm:p-2 rounded-xl transition-all active:scale-90 ${
               showSearch ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
             }`}
           >
