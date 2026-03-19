@@ -38,7 +38,6 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-// Body parser middleware - Base64 images کے لیے
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
@@ -50,7 +49,6 @@ app.use('/api', apiLimiter);
 app.use('/api/auth', authLimiter);
 app.use('/api/messages', messageLimiter);
 
-// ✅ Routes - یہ درست order میں ہیں
 app.use('/api/test', require('./src/routes/testRoutes'));
 app.use('/api/auth', require('./src/routes/authRoutes'));
 app.use('/api/users', require('./src/routes/userRoutes'));
