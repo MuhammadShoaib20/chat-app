@@ -200,39 +200,36 @@ const ChatWindow = ({
 
   return (
     <div className="flex flex-col h-full bg-white dark:bg-gray-950 overflow-hidden relative">
-      {/* Sticky header + button bar container */}
-      <div className="sticky top-0 z-20 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
-        {/* Header with back button and conversation info */}
-        <div className="flex items-center justify-between p-3 sm:p-4 max-sm:px-2 max-sm:py-2 gap-2">
-          <div className="flex items-center min-w-0 flex-1 gap-3 max-sm:gap-1.5">
-            {onOpenSidebar && (
-              <button
-                onClick={onOpenSidebar}
-                className="lg:hidden p-2 max-sm:p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              >
-                <svg width="20" height="20" className="max-sm:w-4 max-sm:h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
+      {/* Header - improved for very small screens */}
+      <div className="flex items-center justify-between p-3 sm:p-4 max-sm:px-2 max-sm:py-2 border-b border-gray-100 dark:border-gray-800 gap-2 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md sticky top-0 z-20">
+        <div className="flex items-center min-w-0 flex-1 gap-3 max-sm:gap-1.5">
+          {onOpenSidebar && (
+            <button
+              onClick={onOpenSidebar}
+              className="lg:hidden p-2 max-sm:p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            >
+              <svg width="20" height="20" className="max-sm:w-4 max-sm:h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+          )}
+          <div className="truncate">
+            <h2 className="text-base sm:text-lg max-sm:text-sm font-bold text-gray-900 dark:text-white truncate leading-tight">
+              {conversation?.name || otherParticipant?.userId?.username}
+            </h2>
+            {!conversation?.isGroup && (
+              <p className="text-[11px] sm:text-xs max-sm:text-[10px] font-medium mt-0.5 flex items-center gap-1.5">
+                <span className={`w-2 h-2 max-sm:w-1.5 max-sm:h-1.5 rounded-full ${isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`}></span>
+                <span className={isOnline ? 'text-green-600 dark:text-green-400' : 'text-gray-500'}>
+                    {isOnline ? 'Online' : 'Offline'}
+                </span>
+              </p>
             )}
-            <div className="truncate">
-              <h2 className="text-base sm:text-lg max-sm:text-sm font-bold text-gray-900 dark:text-white truncate leading-tight">
-                {conversation?.name || otherParticipant?.userId?.username}
-              </h2>
-              {!conversation?.isGroup && (
-                <p className="text-[11px] sm:text-xs max-sm:text-[10px] font-medium mt-0.5 flex items-center gap-1.5">
-                  <span className={`w-2 h-2 max-sm:w-1.5 max-sm:h-1.5 rounded-full ${isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`}></span>
-                  <span className={isOnline ? 'text-green-600 dark:text-green-400' : 'text-gray-500'}>
-                      {isOnline ? 'Online' : 'Offline'}
-                  </span>
-                </p>
-              )}
-            </div>
           </div>
         </div>
 
-        {/* New button bar below header */}
-        <div className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 max-sm:px-2 pb-2">
+        {/* Action buttons - smaller on mobile */}
+        <div className="flex items-center gap-1 sm:gap-2">
           <button
             onClick={() => setShowSearch(!showSearch)}
             className={`p-2.5 max-sm:p-2 rounded-xl transition-all active:scale-90 ${
@@ -281,53 +278,53 @@ const ChatWindow = ({
             </button>
           )}
         </div>
-
-        {/* Search overlay - appears directly below the button bar */}
-        {showSearch && (
-          <div className="absolute top-full left-0 right-0 p-3 max-sm:p-2 bg-white/95 dark:bg-gray-950/95 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 z-30 animate-in slide-in-from-top duration-200">
-            <div className="relative max-w-2xl mx-auto">
-              <input
-                autoFocus
-                type="text"
-                placeholder="Search in messages..."
-                value={searchQuery}
-                onChange={async (e) => {
-                  const q = e.target.value;
-                  setSearchQuery(q);
-                  if (!q.trim() || !conversationId) {
-                    setSearchResults([]);
-                    return;
-                  }
-                  try {
-                    const results = await searchMessages({ conversationId, q });
-                    setSearchResults(results);
-                  } catch (err) {
-                    console.error('Search failed:', err);
-                  }
-                }}
-                className="w-full py-2.5 max-sm:py-2 pl-10 pr-4 bg-gray-100 dark:bg-gray-800 border-none rounded-xl text-sm max-sm:text-xs focus:ring-2 focus:ring-blue-500 transition-all"
-              />
-              <svg className="absolute left-3 top-3 max-sm:left-2 max-sm:top-2.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-            {searchResults.length > 0 && (
-              <div className="mt-2 max-w-2xl mx-auto max-h-48 overflow-y-auto rounded-xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-xl">
-                {searchResults.map((msg) => (
-                  <div
-                    key={msg._id}
-                    className="p-3 max-sm:p-2 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors border-b last:border-0 dark:border-gray-800"
-                    onClick={() => setShowSearch(false)}
-                  >
-                    <p className="text-xs max-sm:text-[10px] font-bold text-blue-600 dark:text-blue-400">{msg.sender?.username}</p>
-                    <p className="text-sm max-sm:text-xs text-gray-600 dark:text-gray-300 truncate">{msg.content}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
       </div>
+
+      {/* Search bar Overlay - mobile optimized */}
+      {showSearch && (
+        <div className="absolute top-[65px] left-0 right-0 p-3 max-sm:p-2 bg-white/95 dark:bg-gray-950/95 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 z-30 animate-in slide-in-from-top duration-200">
+          <div className="relative max-w-2xl mx-auto">
+            <input
+              autoFocus
+              type="text"
+              placeholder="Search in messages..."
+              value={searchQuery}
+              onChange={async (e) => {
+                const q = e.target.value;
+                setSearchQuery(q);
+                if (!q.trim() || !conversationId) {
+                  setSearchResults([]);
+                  return;
+                }
+                try {
+                  const results = await searchMessages({ conversationId, q });
+                  setSearchResults(results);
+                } catch (err) {
+                  console.error('Search failed:', err);
+                }
+              }}
+              className="w-full py-2.5 max-sm:py-2 pl-10 pr-4 bg-gray-100 dark:bg-gray-800 border-none rounded-xl text-sm max-sm:text-xs focus:ring-2 focus:ring-blue-500 transition-all"
+            />
+            <svg className="absolute left-3 top-3 max-sm:left-2 max-sm:top-2.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          {searchResults.length > 0 && (
+            <div className="mt-2 max-w-2xl mx-auto max-h-48 overflow-y-auto rounded-xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-xl">
+              {searchResults.map((msg) => (
+                <div
+                  key={msg._id}
+                  className="p-3 max-sm:p-2 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors border-b last:border-0 dark:border-gray-800"
+                  onClick={() => setShowSearch(false)}
+                >
+                  <p className="text-xs max-sm:text-[10px] font-bold text-blue-600 dark:text-blue-400">{msg.sender?.username}</p>
+                  <p className="text-sm max-sm:text-xs text-gray-600 dark:text-gray-300 truncate">{msg.content}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Messages Area - reduced padding on small screens */}
       <div
