@@ -99,7 +99,7 @@ const GroupInfoPanel = ({ conversation, onClose, onUpdate }) => {
 
   return (
     <div className="fixed inset-0 sm:inset-y-0 sm:right-0 sm:left-auto w-full sm:w-[400px] bg-white dark:bg-gray-950 shadow-2xl overflow-hidden z-50 border-l border-gray-100 dark:border-gray-800 flex flex-col animate-in slide-in-from-right duration-300">
-      
+
       {/* Header */}
       <div className="px-6 py-5 flex items-center justify-between border-b border-gray-50 dark:border-gray-900 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md">
         <div>
@@ -110,14 +110,12 @@ const GroupInfoPanel = ({ conversation, onClose, onUpdate }) => {
           onClick={onClose}
           className="p-2.5 rounded-2xl bg-gray-50 dark:bg-gray-900 text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all active:scale-90"
         >
-          <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-            <path d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
       </div>
 
       <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
-        {/* Group Identity Section */}
+        {/* Group Identity */}
         <div className="flex flex-col items-center text-center mb-8">
           <div className="relative group mb-4">
             <div className="w-28 h-28 rounded-[2.5rem] overflow-hidden shadow-2xl ring-4 ring-gray-50 dark:ring-gray-900 transition-transform group-hover:scale-105 duration-300">
@@ -138,9 +136,7 @@ const GroupInfoPanel = ({ conversation, onClose, onUpdate }) => {
                 onClick={() => setIsEditing(true)}
                 className="absolute -bottom-1 -right-1 bg-white dark:bg-gray-800 text-blue-600 p-2.5 rounded-2xl shadow-xl hover:scale-110 active:scale-95 transition-all border border-gray-100 dark:border-gray-700"
               >
-                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                </svg>
+                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
               </button>
             )}
           </div>
@@ -165,7 +161,7 @@ const GroupInfoPanel = ({ conversation, onClose, onUpdate }) => {
                 <button
                   onClick={handleUpdateGroup}
                   disabled={loading}
-                  className="flex-1 py-3 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-700 shadow-lg shadow-blue-500/20 active:scale-95 transition-all disabled:opacity-50"
+                  className="flex-1 py-3 bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-bold rounded-2xl hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-500/20 active:scale-95 transition-all disabled:opacity-50"
                 >
                   {loading ? 'Saving...' : 'Save Changes'}
                 </button>
@@ -201,9 +197,9 @@ const GroupInfoPanel = ({ conversation, onClose, onUpdate }) => {
             <button
               onClick={() => setShowAddMember(!showAddMember)}
               className={`p-2.5 rounded-xl transition-all active:scale-90 ${
-                showAddMember 
-                ? 'bg-red-50 dark:bg-red-900/20 text-red-500' 
-                : 'bg-blue-50 dark:bg-blue-900/20 text-blue-600'
+                showAddMember
+                  ? 'bg-red-50 dark:bg-red-900/20 text-red-500'
+                  : 'bg-blue-50 dark:bg-blue-900/20 text-blue-600'
               }`}
             >
               {showAddMember ? (
@@ -226,9 +222,7 @@ const GroupInfoPanel = ({ conversation, onClose, onUpdate }) => {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-11 pr-4 py-3.5 bg-gray-50 dark:bg-gray-900 border-2 border-transparent focus:border-blue-500 rounded-2xl text-sm outline-none transition-all"
               />
-              <svg className="absolute left-4 top-4 w-5 h-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+              <svg className="absolute left-4 top-4 w-5 h-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
               {searching && <div className="absolute right-4 top-4 w-5 h-5 border-2 border-blue-500/20 border-t-blue-500 rounded-full animate-spin" />}
             </div>
 
@@ -237,14 +231,14 @@ const GroupInfoPanel = ({ conversation, onClose, onUpdate }) => {
                 {searchResults.map((u) => (
                   <div key={u._id} className="flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
                     <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center text-blue-600 font-bold text-xs">
-                            {u.username.charAt(0).toUpperCase()}
-                        </div>
-                        <span className="text-sm font-bold dark:text-white">{u.username}</span>
+                      <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center text-blue-600 font-bold text-xs">
+                        {u.username.charAt(0).toUpperCase()}
+                      </div>
+                      <span className="text-sm font-bold dark:text-white">{u.username}</span>
                     </div>
                     <button
                       onClick={() => handleAddMember(u._id)}
-                      className="px-4 py-1.5 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-blue-700 transition-all active:scale-95"
+                      className="px-4 py-1.5 bg-gradient-to-br from-blue-600 to-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all active:scale-95"
                     >
                       Add
                     </button>
@@ -270,12 +264,12 @@ const GroupInfoPanel = ({ conversation, onClose, onUpdate }) => {
                   }}
                 />
                 {m.role === 'admin' && (
-                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 rounded-full border-2 border-white dark:border-gray-950 flex items-center justify-center shadow-sm" title="Admin">
-                        <svg width="8" height="8" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                    </div>
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 rounded-full border-2 border-white dark:border-gray-950 flex items-center justify-center shadow-sm" title="Admin">
+                    <svg width="8" height="8" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  </div>
                 )}
               </div>
-              
+
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-bold text-gray-900 dark:text-white truncate">
                   {m.userId?.username} {m.userId?._id === user?._id && <span className="text-gray-400 font-normal">(You)</span>}
@@ -290,9 +284,7 @@ const GroupInfoPanel = ({ conversation, onClose, onUpdate }) => {
                   onClick={() => handleRemoveMember(m.userId?._id)}
                   className="opacity-0 group-hover:opacity-100 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all transform hover:scale-110"
                 >
-                  <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
+                  <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                 </button>
               )}
             </div>
@@ -300,15 +292,13 @@ const GroupInfoPanel = ({ conversation, onClose, onUpdate }) => {
         </div>
       </div>
 
-      {/* Footer / Leave Group */}
+      {/* Leave Group */}
       <div className="p-6 bg-gray-50/50 dark:bg-gray-900/20 border-t border-gray-50 dark:border-gray-900">
         <button
           onClick={handleLeaveGroup}
           className="w-full py-4 px-4 bg-white dark:bg-gray-900 border border-red-100 dark:border-red-900/30 text-red-500 font-black uppercase tracking-[0.2em] text-[11px] rounded-2xl shadow-sm hover:bg-red-500 hover:text-white transition-all active:scale-[0.98] flex items-center justify-center gap-3 group"
         >
-          <svg className="group-hover:translate-x-1 transition-transform" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-            <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-          </svg>
+          <svg className="group-hover:translate-x-1 transition-transform" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
           Leave Conversation
         </button>
       </div>

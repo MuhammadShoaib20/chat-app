@@ -105,7 +105,7 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
           disabled={disabled}
         />
 
-        {/* Action Buttons Group */}
+        {/* Action Buttons */}
         <div className="flex items-center gap-1.5 mb-0.5">
           <button
             type="button"
@@ -117,9 +117,7 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
             {uploading ? (
               <div className="w-5 h-5 border-2 border-blue-500/20 border-t-blue-500 rounded-full animate-spin" />
             ) : (
-              <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" />
-              </svg>
+              <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" /></svg>
             )}
           </button>
 
@@ -128,24 +126,19 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
             onClick={() => setShowEmojiPicker(!showEmojiPicker)}
             disabled={disabled}
             className={`w-10 h-10 flex items-center justify-center rounded-2xl transition-all active:scale-90 ${
-              showEmojiPicker 
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' 
+              showEmojiPicker
+                ? 'bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/30'
                 : 'bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600'
             }`}
           >
-            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="10" />
-              <path d="M8 14s1.5 2 4 2 4-2 4-2" />
-              <line x1="9" y1="9" x2="9.01" y2="9" />
-              <line x1="15" y1="9" x2="15.01" y2="9" />
-            </svg>
+            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M8 14s1.5 2 4 2 4-2 4-2" /><line x1="9" y1="9" x2="9.01" y2="9" /><line x1="15" y1="9" x2="15.01" y2="9" /></svg>
           </button>
         </div>
 
-        {/* Text Area Container */}
+        {/* Text Area */}
         <div className={`flex-1 relative flex items-center min-w-0 rounded-[1.5rem] px-4 py-2.5 transition-all duration-300 border-2 ${
-          disabled 
-            ? 'bg-gray-50 dark:bg-gray-900 border-transparent' 
+          disabled
+            ? 'bg-gray-50 dark:bg-gray-900 border-transparent'
             : 'bg-gray-50 dark:bg-gray-900 border-transparent focus-within:border-blue-500/30 focus-within:bg-white dark:focus-within:bg-gray-950 shadow-inner'
         }`}>
           <textarea
@@ -167,9 +160,7 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
           className="h-12 w-12 sm:w-auto sm:px-6 flex-shrink-0 flex items-center justify-center gap-2 bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-black uppercase tracking-widest text-[11px] rounded-[1.25rem] shadow-xl shadow-blue-500/20 hover:scale-105 active:scale-95 transition-all disabled:opacity-0 disabled:scale-90 disabled:pointer-events-none"
         >
           <span className="hidden sm:block">Send</span>
-          <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" className="transform rotate-45 -translate-y-0.5">
-            <path d="M12 19V5m0 0l-7 7m7-7l7 7" />
-          </svg>
+          <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" className="transform rotate-45 -translate-y-0.5"><path d="M12 19V5m0 0l-7 7m7-7l7 7" /></svg>
         </button>
       </form>
     </div>

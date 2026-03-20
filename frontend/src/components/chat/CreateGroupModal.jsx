@@ -62,7 +62,7 @@ const CreateGroupModal = ({ onClose, onGroupCreated }) => {
   return (
     <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-[2px] flex items-end sm:items-center justify-center z-50 p-0 sm:p-4 animate-in fade-in duration-200">
       <div className="bg-white dark:bg-gray-950 rounded-t-[2rem] sm:rounded-3xl w-full sm:max-w-md max-h-[90vh] overflow-hidden shadow-2xl border border-white/20 dark:border-gray-800 animate-in slide-in-from-bottom-4 duration-300">
-        
+
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-gray-950/50 backdrop-blur-md">
           <div>
@@ -73,15 +73,13 @@ const CreateGroupModal = ({ onClose, onGroupCreated }) => {
             onClick={onClose}
             className="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-500 hover:text-red-500 transition-all active:scale-90"
           >
-            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-              <path d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>
 
         {/* Content */}
         <div className="p-5 overflow-y-auto max-h-[60vh] custom-scrollbar">
-          {/* Group Name Input */}
+          {/* Group Name */}
           <div className="mb-6">
             <label className="block text-xs font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-2 ml-1">
               Group Identity
@@ -96,7 +94,7 @@ const CreateGroupModal = ({ onClose, onGroupCreated }) => {
             />
           </div>
 
-          {/* Search Input */}
+          {/* Search */}
           <div className="mb-4">
             <label className="block text-xs font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-2 ml-1">
               Add Members
@@ -166,9 +164,7 @@ const CreateGroupModal = ({ onClose, onGroupCreated }) => {
                       onClick={() => handleRemoveUser(user._id)}
                       className="w-5 h-5 rounded-lg bg-blue-100 dark:bg-blue-800/50 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all"
                     >
-                      <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
-                        <path d="M6 18L18 6M6 6l12 12" />
-                      </svg>
+                      <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" /></svg>
                     </button>
                   </span>
                 ))}
@@ -177,13 +173,13 @@ const CreateGroupModal = ({ onClose, onGroupCreated }) => {
           )}
         </div>
 
-        {/* Actions Footer */}
+        {/* Footer */}
         <div className="p-5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 flex flex-row-reverse gap-3">
           <button
             type="button"
             onClick={handleCreate}
             disabled={loading || !groupName.trim() || selectedUsers.length < 1}
-            className="flex-1 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-blue-500/20 transition-all active:scale-95 disabled:grayscale disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2"
+            className="flex-1 py-3.5 bg-gradient-to-br from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-2xl shadow-lg shadow-blue-500/20 transition-all active:scale-95 disabled:grayscale disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2"
           >
             {loading ? (
               <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />

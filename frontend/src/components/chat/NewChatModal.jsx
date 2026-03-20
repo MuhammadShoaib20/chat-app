@@ -96,7 +96,7 @@ const NewChatModal = ({ onClose, onChatCreated }) => {
   return (
     <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-md flex items-center justify-center z-[100] p-4 animate-in fade-in duration-300">
       <div className="bg-white dark:bg-gray-900 rounded-[2rem] w-full max-w-md max-h-[85vh] flex flex-col shadow-2xl border border-white/20 dark:border-gray-800 overflow-hidden animate-in zoom-in-95 duration-200">
-        
+
         {/* Header */}
         <div className="p-6 pb-2">
           <h3 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">
@@ -107,7 +107,7 @@ const NewChatModal = ({ onClose, onChatCreated }) => {
           </p>
         </div>
 
-        {/* Mode Toggle Slider */}
+        {/* Mode Toggle */}
         <div className="px-6 mb-6">
           <div className="flex p-1.5 bg-gray-100 dark:bg-gray-800 rounded-2xl relative">
             <button
@@ -127,7 +127,7 @@ const NewChatModal = ({ onClose, onChatCreated }) => {
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 custom-scrollbar">
-          {/* Group Details Section */}
+          {/* Group Details */}
           {mode === 'group' && (
             <div className="animate-in slide-in-from-top-4 duration-300">
               <div className="flex flex-col items-center mb-6 group/avatar">
@@ -210,7 +210,7 @@ const NewChatModal = ({ onClose, onChatCreated }) => {
                       className="w-11 h-11 rounded-2xl object-cover ring-4 ring-gray-100 dark:ring-gray-800 group-hover:ring-blue-100 dark:group-hover:ring-blue-900/30 transition-all"
                     />
                     {isSelected && (
-                      <div className="absolute -top-1 -right-1 w-5 h-5 bg-blue-600 rounded-full border-2 border-white dark:border-gray-900 flex items-center justify-center animate-in zoom-in">
+                      <div className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full border-2 border-white dark:border-gray-900 flex items-center justify-center animate-in zoom-in">
                         <svg width="10" height="10" fill="none" stroke="white" strokeWidth="4" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" /></svg>
                       </div>
                     )}
@@ -225,7 +225,7 @@ const NewChatModal = ({ onClose, onChatCreated }) => {
           </div>
         </div>
 
-        {/* Footer Actions */}
+        {/* Footer */}
         <div className="p-6 bg-gray-50 dark:bg-gray-950/50 flex gap-3">
           <button
             onClick={onClose}

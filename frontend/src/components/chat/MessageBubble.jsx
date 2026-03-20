@@ -4,7 +4,7 @@ import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import MessageActions from './MessageActions';
 
-const MessageBubble = ({ message, isOwn, onEdit, onDelete, onAddReaction }) => {
+const MessageBubble = ({ message, isOwn, onEdit, onDelete, onAddReaction, showAvatar }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(message.content || '');
   const [showPicker, setShowPicker] = useState(false);
@@ -134,9 +134,9 @@ const MessageBubble = ({ message, isOwn, onEdit, onDelete, onAddReaction }) => {
   return (
     <div className={`flex w-full mb-4 ${isOwn ? 'justify-end' : 'justify-start'} group`}>
       <div className={`relative flex flex-col max-w-[85%] sm:max-w-[70%] ${isOwn ? 'items-end' : 'items-start'}`}>
-        
-        {/* Sender Label */}
-        {!isOwn && message.sender?.username && (
+
+        {/* Sender Label for group */}
+        {showAvatar && message.sender?.username && (
           <span className="text-[11px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-500 mb-1 ml-2">
             {message.sender.username}
           </span>
@@ -144,12 +144,11 @@ const MessageBubble = ({ message, isOwn, onEdit, onDelete, onAddReaction }) => {
 
         {/* Bubble Container */}
         <div className="relative flex items-center gap-2 group">
-          
           <div
             className={`
               relative px-4 py-3 rounded-[1.5rem] shadow-sm transition-all duration-300
-              ${isOwn 
-                ? 'bg-gradient-to-br from-blue-600 to-blue-500 text-white rounded-tr-none border-b border-blue-400 shadow-blue-500/10' 
+              ${isOwn
+                ? 'bg-gradient-to-br from-blue-600 to-blue-500 text-white rounded-tr-none border-b border-blue-400 shadow-blue-500/10'
                 : 'bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white rounded-tl-none shadow-black/5'
               }
             `}
@@ -168,7 +167,7 @@ const MessageBubble = ({ message, isOwn, onEdit, onDelete, onAddReaction }) => {
             </div>
           </div>
 
-          {/* Inline Action Buttons (Hover) */}
+          {/* Inline Action Buttons (hover) */}
           {!isEditing && message.type !== 'deleted' && (
             <div className={`flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200 transform ${isOwn ? 'flex-row-reverse -translate-x-2' : 'translate-x-2'}`}>
               <button
