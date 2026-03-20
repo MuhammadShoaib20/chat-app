@@ -206,7 +206,7 @@ const ChatWindow = ({
           {onOpenSidebar && (
             <button
               onClick={onOpenSidebar}
-              className="lg:hidden p-2 max-sm:p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="lg:hidden mt-2 p-2 max-sm:p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
               <svg width="20" height="20" className="max-sm:w-4 max-sm:h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path d="M15 19l-7-7 7-7" />
