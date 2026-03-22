@@ -6,19 +6,15 @@ const MessageActions = ({ onEdit, onDelete, onShare, isOwn, message }) => {
   const [alignLeft, setAlignLeft] = useState(false);
   const menuRef = useRef(null);
 
-  // Smart positioning — recalculate every time menu opens
   useEffect(() => {
     if (!showMenu || !menuRef.current) return;
     const rect = menuRef.current.getBoundingClientRect();
     const DROPDOWN_H = 200;
     const DROPDOWN_W = 176;
-    // Open downward by default, only go up if not enough space below
     setDropUp(rect.bottom + DROPDOWN_H > window.innerHeight - 16);
-    // Align to left edge of trigger if dropdown would overflow right side
     setAlignLeft(rect.left - DROPDOWN_W < 8);
   }, [showMenu]);
 
-  // Close on outside click / touch
   useEffect(() => {
     const close = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -52,7 +48,6 @@ const MessageActions = ({ onEdit, onDelete, onShare, isOwn, message }) => {
 
   return (
     <div className="relative inline-block leading-none" ref={menuRef}>
-      {/* Trigger */}
       <button
         onClick={() => setShowMenu((v) => !v)}
         className={`p-1.5 rounded-xl transition-all duration-200 outline-none active:scale-90 touch-manipulation select-none ${
@@ -71,17 +66,14 @@ const MessageActions = ({ onEdit, onDelete, onShare, isOwn, message }) => {
         </svg>
       </button>
 
-      {/* Dropdown */}
       {showMenu && (
         <>
-          {/* Full-screen backdrop — catches taps outside on mobile */}
           <div
             className="fixed inset-0 z-40"
             onClick={() => setShowMenu(false)}
             onTouchStart={() => setShowMenu(false)}
             aria-hidden="true"
           />
-
           <div
             className={[
               'absolute z-50 w-44',
@@ -95,14 +87,12 @@ const MessageActions = ({ onEdit, onDelete, onShare, isOwn, message }) => {
               alignLeft ? 'left-0' : 'right-0',
             ].join(' ')}
           >
-            {/* Section label */}
             <div className="px-3 py-1.5 mb-0.5">
               <p className="text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">
                 Actions
               </p>
             </div>
 
-            {/* Edit */}
             <button
               onClick={() => { onEdit(); setShowMenu(false); }}
               className="w-[calc(100%-12px)] mx-1.5 text-left px-3 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 rounded-xl transition-all flex items-center gap-2.5 group touch-manipulation"
@@ -115,7 +105,6 @@ const MessageActions = ({ onEdit, onDelete, onShare, isOwn, message }) => {
               Edit
             </button>
 
-            {/* Share / Copy */}
             <button
               onClick={handleShare}
               className="w-[calc(100%-12px)] mx-1.5 text-left px-3 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400 rounded-xl transition-all flex items-center gap-2.5 group touch-manipulation"
@@ -130,7 +119,6 @@ const MessageActions = ({ onEdit, onDelete, onShare, isOwn, message }) => {
 
             <div className="h-px bg-gray-100 dark:bg-gray-800 my-1 mx-3" />
 
-            {/* Delete */}
             <button
               onClick={() => { onDelete(); setShowMenu(false); }}
               className="w-[calc(100%-12px)] mx-1.5 text-left px-3 py-2.5 text-sm font-semibold text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all flex items-center gap-2.5 group touch-manipulation"

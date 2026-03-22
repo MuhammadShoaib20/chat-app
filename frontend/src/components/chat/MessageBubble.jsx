@@ -9,6 +9,7 @@ const MessageBubble = ({ message, isOwn, onEdit, onDelete, onAddReaction, showAv
   const [editText, setEditText] = useState(message.content || '');
   const [showPicker, setShowPicker] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [showActions, setShowActions] = useState(false); // for mobile menu
 
   const reactionCounts = message.reactions?.reduce((acc, { emoji }) => {
     acc[emoji] = (acc[emoji] || 0) + 1;
@@ -205,29 +206,46 @@ const MessageBubble = ({ message, isOwn, onEdit, onDelete, onAddReaction, showAv
             </div>
           </div>
 
-          {/* Hover action buttons */}
-          {!isEditing && message.type !== 'deleted' && (
-            <div className={`absolute top-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200 z-10 ${
-              isOwn ? 'right-1' : 'left-1'
-            }`}>
+          {/* Action buttons (always visible for own messages) */}
+          {!isEditing && message.type !== 'deleted' && isOwn && (
+            <div className="absolute top-1 right-1 z-20">
               <button
-                onClick={() => setShowPicker(!showPicker)}
+                onClick={() => setShowActions(!showActions)}
                 className="w-7 h-7 bg-white dark:bg-gray-800 rounded-full shadow-lg border border-gray-100 dark:border-gray-700 flex items-center justify-center hover:scale-110 active:scale-90 transition-all"
-                aria-label="Add reaction"
+                aria-label="Message actions"
               >
-                <span className="text-xs leading-none">😊</span>
+                <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
+                  <circle cx="12" cy="5" r="2" />
+                  <circle cx="12" cy="12" r="2" />
+                  <circle cx="12" cy="19" r="2" />
+                </svg>
               </button>
-              {isOwn && (
-                <div className="bg-white dark:bg-gray-800 rounded-full shadow-lg border border-gray-100 dark:border-gray-700 z-20">
-                  <MessageActions
-                    onEdit={() => setIsEditing(true)}
-                    onDelete={() => onDelete(message._id)}
-                    isOwn={isOwn}
-                    message={message}
-                  />
-                </div>
-              )}
             </div>
+          )}
+
+          {/* Dropdown menu */}
+          {showActions && isOwn && (
+            <>
+              <div
+                className="fixed inset-0 z-40"
+                onClick={() => setShowActions(false)}
+                aria-hidden="true"
+              />
+              <div className="absolute z-50 right-0 top-full mt-1">
+                <MessageActions
+                  onEdit={() => {
+                    setIsEditing(true);
+                    setShowActions(false);
+                  }}
+                  onDelete={() => {
+                    onDelete(message._id);
+                    setShowActions(false);
+                  }}
+                  isOwn={isOwn}
+                  message={message}
+                />
+              </div>
+            </>
           )}
         </div>
 
