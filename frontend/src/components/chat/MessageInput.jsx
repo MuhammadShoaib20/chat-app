@@ -108,24 +108,23 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
   }`}>
         
         {/* Input Area */}
-       <textarea
-  ref={textareaRef}
-  value={message}
-  onChange={handleChange}
-  onFocus={() => setIsFocused(true)}
-  onBlur={() => setIsFocused(false)}
-  onKeyDown={(e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSubmit(e);
-    }
-  }}
-  placeholder="Type a message..."
-  rows={1}
-  // Yahan changes kiye gaye hain: focus:shadow-none aur shadow-none add kiya hai
-  className="w-full bg-transparent border-none outline-none focus:outline-none ring-0 focus:ring-0 shadow-none focus:shadow-none resize-none text-[15px] md:text-base text-gray-800 dark:text-gray-100 px-4 pt-3 pb-1 min-h-[45px] max-h-40 custom-scrollbar"
-  disabled={disabled}
-/>
+        <textarea
+          ref={textareaRef}
+          value={message}
+          onChange={handleChange}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              handleSubmit(e);
+            }
+          }}
+          placeholder="Type a message..."
+          rows={1}
+          className="w-full bg-transparent border-none focus:ring-0 resize-none outline-none text-[15px] md:text-base text-gray-800 dark:text-gray-100 px-4 pt-3 pb-1 min-h-[45px] max-h-40 custom-scrollbar"
+          disabled={disabled}
+        />
 
         {/* Bottom Toolbar */}
         <div className="flex items-center justify-between px-2 pb-1.5">

@@ -17,28 +17,23 @@ const GroupInfoPanel = ({ conversation, onClose, onUpdate }) => {
 
   const isAdmin = members.some(p => p.userId?._id === user?._id && p.role === 'admin');
 
-  // Debounced user search
   useEffect(() => {
-    if (!searchTerm.trim()) {
-      setSearchResults([]);
-      return;
-    }
+    if (!searchTerm.trim()) { setSearchResults([]); return; }
     setSearching(true);
-    const timer = setTimeout(async () => {
+    const delay = setTimeout(async () => {
       try {
         const results = await searchUsers(searchTerm);
         const existingIds = members.map(m => m.userId?._id);
         setSearchResults(results.filter(u => !existingIds.includes(u._id)));
-      } catch (err) {
-        console.error('Search failed:', err);
+      } catch (error) {
+        console.error('Search failed:', error);
       } finally {
         setSearching(false);
       }
     }, 300);
-    return () => clearTimeout(timer);
+    return () => clearTimeout(delay);
   }, [searchTerm, members]);
 
-  // Update group info
   const handleUpdateGroup = async () => {
     try {
       setLoading(true);
@@ -55,7 +50,6 @@ const GroupInfoPanel = ({ conversation, onClose, onUpdate }) => {
     }
   };
 
-  // Add member
   const handleAddMember = async (userId) => {
     try {
       setLoading(true);
@@ -73,7 +67,6 @@ const GroupInfoPanel = ({ conversation, onClose, onUpdate }) => {
     }
   };
 
-  // Remove member
   const handleRemoveMember = async (userId) => {
     if (!window.confirm('Remove this member?')) return;
     try {
@@ -89,13 +82,12 @@ const GroupInfoPanel = ({ conversation, onClose, onUpdate }) => {
     }
   };
 
-  // Leave group
   const handleLeaveGroup = async () => {
     if (!window.confirm('Leave this group?')) return;
     try {
       await api.delete(`/api/conversations/${conversation._id}/participants/${user._id}`);
       onClose();
-      window.location.reload(); // or navigate away
+      window.location.reload();
     } catch (error) {
       console.error('Leave group failed:', error);
     }
@@ -103,6 +95,7 @@ const GroupInfoPanel = ({ conversation, onClose, onUpdate }) => {
 
   return (
     <div className="fixed inset-0 sm:inset-y-0 sm:right-0 sm:left-auto w-full sm:w-[380px] bg-white dark:bg-gray-950 shadow-2xl overflow-hidden z-50 border-l border-gray-100 dark:border-gray-800 flex flex-col animate-in slide-in-from-right duration-300">
+
       {/* ── Header ── */}
       <div className="px-5 py-4 flex items-center justify-between border-b border-gray-100 dark:border-gray-800 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md">
         <div>
@@ -124,6 +117,7 @@ const GroupInfoPanel = ({ conversation, onClose, onUpdate }) => {
 
       {/* ── Scrollable Body ── */}
       <div className="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-6">
+
         {/* Group Identity */}
         <div className="flex flex-col items-center text-center">
           <div className="relative group mb-4">

@@ -15,6 +15,8 @@ const MessageActions = ({ onEdit, onDelete, onShare, isOwn, message }) => {
     // Open downward by default, only go up if not enough space below
     setDropUp(rect.bottom + DROPDOWN_H > window.innerHeight - 16);
     // Align to left edge of trigger if dropdown would overflow right side
+    // But since our bubbles are already near right edge on mobile,
+    // check if aligning right (default) would cut off on LEFT side
     setAlignLeft(rect.left - DROPDOWN_W < 8);
   }, [showMenu]);
 
@@ -52,6 +54,7 @@ const MessageActions = ({ onEdit, onDelete, onShare, isOwn, message }) => {
 
   return (
     <div className="relative inline-block leading-none" ref={menuRef}>
+
       {/* Trigger */}
       <button
         onClick={() => setShowMenu((v) => !v)}

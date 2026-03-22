@@ -42,7 +42,6 @@ const ChatWindow = ({
   const otherUserId = otherParticipant?.userId?._id;
   const isOnline = otherUserId ? onlineUsers.includes(otherUserId) : false;
 
-  // Fetch block status
   useEffect(() => {
     if (!otherUserId || conversation?.isGroup) return;
     getBlockStatus(otherUserId)
@@ -50,7 +49,6 @@ const ChatWindow = ({
       .catch((e) => console.error('Failed to load block status:', e));
   }, [otherUserId, conversation?.isGroup]);
 
-  // Fetch messages
   const fetchMessages = useCallback(async (pageNum, isInitial = false) => {
     if (!conversationId) return;
     if (isInitial) setLoadingInitial(true);
@@ -64,7 +62,9 @@ const ChatWindow = ({
       } else {
         const container = messagesContainerRef.current;
         const oldScrollHeight = container?.scrollHeight || 0;
+        
         setMessages(prev => [...newMessages, ...prev]);
+        
         setTimeout(() => {
           if (container) {
             container.scrollTop = container.scrollHeight - oldScrollHeight;
@@ -81,7 +81,6 @@ const ChatWindow = ({
     }
   }, [conversationId]);
 
-  // Initial load & socket join
   useEffect(() => {
     if (conversationId) {
       setMessages([]);
@@ -91,12 +90,10 @@ const ChatWindow = ({
     }
   }, [conversationId, socket, fetchMessages]);
 
-  // Scroll to bottom
   const scrollToBottom = (smooth = false) => {
     messagesEndRef.current?.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto' });
   };
 
-  // Auto-scroll when near bottom after new messages
   useEffect(() => {
     if (!messages.length) return;
     const container = messagesContainerRef.current;
@@ -107,7 +104,6 @@ const ChatWindow = ({
     }
   }, [messages]);
 
-  // Socket event handlers
   useEffect(() => {
     if (!socket) return;
 
@@ -159,7 +155,6 @@ const ChatWindow = ({
     };
   }, [socket, conversationId, user?._id]);
 
-  // Mark messages as read
   useEffect(() => {
     if (!conversationId || !user?._id || !messages.length) return;
     const unread = messages.filter(
@@ -172,7 +167,6 @@ const ChatWindow = ({
     });
   }, [conversationId, user?._id, messages]);
 
-  // Group messages with date headers
   const messagesWithDateHeaders = [];
   let lastDate = null;
   messages.forEach((msg) => {
@@ -184,36 +178,6 @@ const ChatWindow = ({
     }
     messagesWithDateHeaders.push({ type: 'message', message: msg });
   });
-
-  // Block/unblock handler
-  const handleBlockToggle = useCallback(async () => {
-    try {
-      if (blockStatus.hasBlocked) {
-        await unblockUser(otherUserId);
-        setBlockStatus({ ...blockStatus, hasBlocked: false });
-      } else {
-        await blockUser(otherUserId);
-        setBlockStatus({ ...blockStatus, hasBlocked: true });
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }, [blockStatus, otherUserId]);
-
-  // Search handler
-  const handleSearch = useCallback(async (q) => {
-    setSearchQuery(q);
-    if (!q.trim() || !conversationId) {
-      setSearchResults([]);
-      return;
-    }
-    try {
-      const results = await searchMessages({ conversationId, q });
-      setSearchResults(results);
-    } catch (err) {
-      console.error(err);
-    }
-  }, [conversationId]);
 
   if (!conversationId) {
     return (
@@ -301,7 +265,6 @@ const ChatWindow = ({
                 ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
                 : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
             }`}
-            aria-label="Search messages"
           >
             <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
@@ -310,13 +273,22 @@ const ChatWindow = ({
 
           {!conversation?.isGroup && otherParticipant && (
             <button
-              onClick={handleBlockToggle}
+              onClick={async () => {
+                try {
+                  if (blockStatus.hasBlocked) {
+                    await unblockUser(otherUserId);
+                    setBlockStatus({ ...blockStatus, hasBlocked: false });
+                  } else {
+                    await blockUser(otherUserId);
+                    setBlockStatus({ ...blockStatus, hasBlocked: true });
+                  }
+                } catch (e) { console.error(e); }
+              }}
               className={`p-2 rounded-xl transition-all active:scale-90 ${
                 blockStatus.hasBlocked
                   ? 'text-red-500 bg-red-50 dark:bg-red-900/20'
                   : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
               }`}
-              aria-label={blockStatus.hasBlocked ? 'Unblock user' : 'Block user'}
             >
               <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
@@ -325,7 +297,7 @@ const ChatWindow = ({
           )}
 
           {conversation?.isGroup && (
-            <button onClick={onOpenInfo} className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all active:scale-90" aria-label="Group info">
+            <button onClick={onOpenInfo} className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all active:scale-90">
               <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
               </svg>
@@ -346,7 +318,15 @@ const ChatWindow = ({
               type="text"
               placeholder="Search in messages..."
               value={searchQuery}
-              onChange={(e) => handleSearch(e.target.value)}
+              onChange={async (e) => {
+                const q = e.target.value;
+                setSearchQuery(q);
+                if (!q.trim() || !conversationId) { setSearchResults([]); return; }
+                try {
+                  const results = await searchMessages({ conversationId, q });
+                  setSearchResults(results);
+                } catch (err) { console.error(err); }
+              }}
               className="w-full py-2.5 pl-10 pr-4 bg-gray-100 dark:bg-gray-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-blue-500/30 transition-all outline-none"
             />
           </div>
@@ -363,7 +343,7 @@ const ChatWindow = ({
         </div>
       )}
 
-      {/* ── Messages Area ── */}
+      {/* ── Messages Area (FIXED SCROLLER) ── */}
       <div
         ref={messagesContainerRef}
         className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-2 md:px-5 bg-gray-50 dark:bg-gray-950 custom-scrollbar flex flex-col"
@@ -372,7 +352,8 @@ const ChatWindow = ({
           <div className="space-y-6 p-2"><Skeleton count={4} height={70} borderRadius={16} /></div>
         ) : (
           <div className="flex flex-col min-h-full">
-            <div className="flex-1" /> {/* Pushes content to bottom when few messages */}
+            {/* Push messages to bottom if there are few */}
+            <div className="flex-1" /> 
 
             {hasMore && (
               <div className="flex justify-center py-4">
