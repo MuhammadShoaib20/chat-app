@@ -195,7 +195,7 @@ const ChatWindow = ({
     <div className="flex flex-col h-full min-h-0 bg-white dark:bg-gray-950 overflow-hidden relative">
 
       {/* ── Header ── */}
-      <div className="sticky top-0 z-20 flex items-center justify-between px-4 py-3 md:px-5 md:py-4 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 gap-2">
+      <div className="flex-shrink-0 z-20 flex items-center justify-between px-4 py-3 md:px-5 md:py-4 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 gap-2">
         <div className="flex items-center min-w-0 flex-1 gap-3">
 
           {/* Back button (mobile) */}
@@ -369,7 +369,7 @@ const ChatWindow = ({
       {/* ── Messages Area ── */}
       <div
         ref={messagesContainerRef}
-        className="flex-1 min-h-0 overflow-y-auto px-4 py-4 md:px-5 space-y-1 bg-gray-50 dark:bg-gray-950 scroll-smooth custom-scrollbar"
+        className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-4 md:px-5 bg-gray-50 dark:bg-gray-950 custom-scrollbar"
       >
         {loadingInitial ? (
           <div className="space-y-6 p-2">
@@ -389,10 +389,11 @@ const ChatWindow = ({
               </div>
             )}
 
+            <div className="flex flex-col gap-1 pb-2">
             {messagesWithDateHeaders.map((item, index) => {
               if (item.type === 'date') {
                 return (
-                  <div key={`date-${index}`} className="flex justify-center my-6">
+                  <div key={`date-${index}`} className="flex justify-center my-4">
                     <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 px-3 py-1 rounded-lg shadow-sm">
                       {formatDateHeader(item.date)}
                     </span>
@@ -429,7 +430,8 @@ const ChatWindow = ({
               </div>
             )}
 
-            <div ref={messagesEndRef} className="h-2" />
+            <div ref={messagesEndRef} className="h-1" />
+            </div>
           </>
         )}
       </div>

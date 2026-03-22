@@ -84,7 +84,7 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
   const canSend = message.trim() && !disabled && !uploading;
 
   return (
-    <div className="relative p-3 md:p-4 bg-white/80 dark:bg-gray-950/80 backdrop-blur-lg border-t border-gray-100 dark:border-gray-800">
+    <div className="flex-shrink-0 relative p-3 md:p-4 bg-white/80 dark:bg-gray-950/80 backdrop-blur-lg border-t border-gray-100 dark:border-gray-800">
 
       {/* Emoji picker */}
       {showEmojiPicker && (
