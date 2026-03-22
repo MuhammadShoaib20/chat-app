@@ -64,17 +64,20 @@ const CreateGroupModal = ({ onClose, onGroupCreated }) => {
       <div className="bg-white dark:bg-gray-950 rounded-t-[2rem] sm:rounded-3xl w-full sm:max-w-md max-h-[90vh] overflow-hidden shadow-2xl border border-white/20 dark:border-gray-800 animate-in slide-in-from-bottom-4 duration-300">
 
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-gray-950/50 backdrop-blur-md">
-          <div>
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white leading-none">Create Group</h3>
-            <p className="text-xs text-gray-500 mt-1">Start a new group conversation</p>
+        <div className="sticky top-0 bg-white/50 dark:bg-gray-950/50 backdrop-blur-md p-5 border-b border-gray-100 dark:border-gray-800">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white leading-none">Create Group</h3>
+              <p className="text-xs text-gray-500 mt-1">Start a new group conversation</p>
+            </div>
+            <button
+              onClick={onClose}
+              className="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-500 hover:text-red-500 transition-all active:scale-90"
+              aria-label="Close"
+            >
+              <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-500 hover:text-red-500 transition-all active:scale-90"
-          >
-            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" /></svg>
-          </button>
         </div>
 
         {/* Content */}
@@ -90,7 +93,7 @@ const CreateGroupModal = ({ onClose, onGroupCreated }) => {
               placeholder="Give your group a name..."
               value={groupName}
               onChange={(e) => setGroupName(e.target.value)}
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-transparent focus:border-blue-500 dark:focus:border-blue-500 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none"
+              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-transparent focus:border-blue-500 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none"
             />
           </div>
 
@@ -163,6 +166,7 @@ const CreateGroupModal = ({ onClose, onGroupCreated }) => {
                       type="button"
                       onClick={() => handleRemoveUser(user._id)}
                       className="w-5 h-5 rounded-lg bg-blue-100 dark:bg-blue-800/50 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all"
+                      aria-label="Remove user"
                     >
                       <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" /></svg>
                     </button>
@@ -174,7 +178,7 @@ const CreateGroupModal = ({ onClose, onGroupCreated }) => {
         </div>
 
         {/* Footer */}
-        <div className="p-5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 flex flex-row-reverse gap-3">
+        <div className="sticky bottom-0 p-5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 flex flex-row-reverse gap-3">
           <button
             type="button"
             onClick={handleCreate}

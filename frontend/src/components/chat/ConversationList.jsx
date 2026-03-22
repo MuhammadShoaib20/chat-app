@@ -107,12 +107,12 @@ const ConversationList = ({ selectedId, onSelectConversation }) => {
   return (
     <div className="h-full flex flex-col bg-white dark:bg-gray-950 border-r border-gray-100 dark:border-gray-800">
       {/* Header */}
-      <div className="p-4 flex items-center justify-between bg-white dark:bg-gray-950 sticky top-0 z-10">
+      <div className="sticky top-0 z-10 p-4 flex items-center justify-between bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
         <h1 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">Chats</h1>
         <button
           onClick={() => setShowNewChat(true)}
           className="p-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-xl hover:scale-105 active:scale-95 transition-all"
-          title="New Chat"
+          aria-label="New chat"
         >
           <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" /></svg>
         </button>
@@ -129,7 +129,7 @@ const ConversationList = ({ selectedId, onSelectConversation }) => {
             <p className="text-xs mt-1">Tap the plus icon to start chatting</p>
           </div>
         ) : (
-          <div className="px-2 space-y-0.5">
+          <div className="px-2 space-y-1">
             {conversations.map(conv => {
               let displayName = conv.name;
               let avatar = conv.avatar;
@@ -216,6 +216,7 @@ const ConversationList = ({ selectedId, onSelectConversation }) => {
                           deleteConversation(conv._id);
                         }}
                         className="ml-2 opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-red-500 transition-all transform hover:scale-110"
+                        aria-label="Delete conversation"
                       >
                         <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                       </button>
@@ -239,7 +240,7 @@ const ConversationList = ({ selectedId, onSelectConversation }) => {
         <button
           onClick={handleLogout}
           className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-          title="Logout"
+          aria-label="Logout"
         >
           <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
         </button>

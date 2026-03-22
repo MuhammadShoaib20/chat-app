@@ -187,11 +187,11 @@ const ChatWindow = ({
 
   if (!conversationId) {
     return (
-      <div className="h-full flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-950 p-8 max-sm:p-4 text-center animate-in fade-in duration-500">
-        <div className="w-20 h-20 max-sm:w-16 max-sm:h-16 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center mb-4">
-          <svg className="w-10 h-10 max-sm:w-8 max-sm:h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-2.555-.337A5.945 5.945 0 015.41 20.97a.598.598 0 01-.784-.57l.028-1.488A5.913 5.913 0 012.13 16H2.13a5.94 5.94 0 01-.63-2.557C1.5 8.582 5.532 5 10.5 5S19.5 8.582 19.5 13z" /></svg>
+      <div className="h-full flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-950 p-6 text-center animate-in fade-in duration-500">
+        <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center mb-4 shadow-md">
+          <svg className="w-10 h-10 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-2.555-.337A5.945 5.945 0 015.41 20.97a.598.598 0 01-.784-.57l.028-1.488A5.913 5.913 0 012.13 16H2.13a5.94 5.94 0 01-.63-2.557C1.5 8.582 5.532 5 10.5 5S19.5 8.582 19.5 13z" /></svg>
         </div>
-        <p className="text-gray-500 dark:text-gray-400 font-medium text-sm max-sm:text-xs">Select a conversation to start chatting</p>
+        <p className="text-gray-500 dark:text-gray-400 font-medium text-sm">Select a conversation to start chatting</p>
       </div>
     );
   }
@@ -199,23 +199,24 @@ const ChatWindow = ({
   return (
     <div className="flex flex-col h-full bg-white dark:bg-gray-950 overflow-hidden relative">
       {/* Header */}
-      <div className="flex items-center justify-between p-3 sm:p-4 max-sm:px-2 max-sm:py-2 border-b border-gray-100 dark:border-gray-800 gap-2 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md sticky top-0 z-20">
-        <div className="flex items-center min-w-0 flex-1 gap-3 max-sm:gap-1.5">
+      <div className="sticky top-0 z-20 flex items-center justify-between px-4 py-3 md:px-5 md:py-4 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 gap-2">
+        <div className="flex items-center min-w-0 flex-1 gap-3">
           {onOpenSidebar && (
             <button
               onClick={onOpenSidebar}
-              className="lg:hidden p-2 max-sm:p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="lg:hidden p-2 -ml-1 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              aria-label="Open sidebar"
             >
-              <svg width="20" height="20" className="max-sm:w-4 max-sm:h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" /></svg>
+              <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" /></svg>
             </button>
           )}
           <div className="truncate">
-            <h2 className="text-base sm:text-lg max-sm:text-sm font-bold text-gray-900 dark:text-white truncate leading-tight">
+            <h2 className="text-base md:text-lg font-bold text-gray-900 dark:text-white truncate leading-tight">
               {conversation?.name || otherParticipant?.userId?.username}
             </h2>
             {!conversation?.isGroup && (
-              <p className="text-[11px] sm:text-xs max-sm:text-[10px] font-medium mt-0.5 flex items-center gap-1.5">
-                <span className={`w-2 h-2 max-sm:w-1.5 max-sm:h-1.5 rounded-full ${isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`}></span>
+              <p className="text-xs font-medium mt-0.5 flex items-center gap-1.5">
+                <span className={`w-2 h-2 rounded-full ${isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`}></span>
                 <span className={isOnline ? 'text-green-600 dark:text-green-400' : 'text-gray-500'}>
                   {isOnline ? 'Online' : 'Offline'}
                 </span>
@@ -225,14 +226,15 @@ const ChatWindow = ({
         </div>
 
         {/* Action buttons */}
-        <div className="flex items-center gap-1 sm:gap-2">
+        <div className="flex items-center gap-1 md:gap-2">
           <button
             onClick={() => setShowSearch(!showSearch)}
-            className={`p-2.5 max-sm:p-2 rounded-xl transition-all active:scale-90 ${
+            className={`p-2 rounded-xl transition-all active:scale-90 ${
               showSearch ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
             }`}
+            aria-label="Search messages"
           >
-            <svg width="20" height="20" className="max-sm:w-4 max-sm:h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
+            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
           </button>
 
           {!conversation?.isGroup && otherParticipant && (
@@ -250,21 +252,22 @@ const ChatWindow = ({
                   console.error('Block/unblock failed:', e);
                 }
               }}
-              className={`p-2.5 max-sm:p-2 rounded-xl transition-all active:scale-90 ${
+              className={`p-2 rounded-xl transition-all active:scale-90 ${
                 blockStatus.hasBlocked ? 'text-red-600 bg-red-50 dark:bg-red-900/20' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
               }`}
               title={blockStatus.hasBlocked ? 'Unblock' : 'Block'}
             >
-              <svg width="20" height="20" className="max-sm:w-4 max-sm:h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
+              <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
             </button>
           )}
 
           {conversation?.isGroup && (
             <button
               onClick={onOpenInfo}
-              className="p-2.5 max-sm:p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all active:scale-90"
+              className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all active:scale-90"
+              aria-label="Group info"
             >
-              <svg width="20" height="20" className="max-sm:w-4 max-sm:h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+              <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
             </button>
           )}
         </div>
@@ -272,7 +275,7 @@ const ChatWindow = ({
 
       {/* Search overlay */}
       {showSearch && (
-        <div className="absolute top-[65px] left-0 right-0 p-3 max-sm:p-2 bg-white/95 dark:bg-gray-950/95 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 z-30 animate-in slide-in-from-top duration-200">
+        <div className="absolute top-[calc(100%+0px)] left-0 right-0 p-3 bg-white/95 dark:bg-gray-950/95 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 z-30 animate-in slide-in-from-top duration-200 shadow-lg">
           <div className="relative max-w-2xl mx-auto">
             <input
               autoFocus
@@ -293,20 +296,20 @@ const ChatWindow = ({
                   console.error('Search failed:', err);
                 }
               }}
-              className="w-full py-2.5 max-sm:py-2 pl-10 pr-4 bg-gray-100 dark:bg-gray-800 border-none rounded-xl text-sm max-sm:text-xs focus:ring-2 focus:ring-blue-500 transition-all"
+              className="w-full py-2.5 pl-10 pr-4 bg-gray-100 dark:bg-gray-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-blue-500 transition-all"
             />
-            <svg className="absolute left-3 top-3 max-sm:left-2 max-sm:top-2.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            <svg className="absolute left-3 top-3 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           </div>
           {searchResults.length > 0 && (
             <div className="mt-2 max-w-2xl mx-auto max-h-48 overflow-y-auto rounded-xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-xl">
               {searchResults.map((msg) => (
                 <div
                   key={msg._id}
-                  className="p-3 max-sm:p-2 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors border-b last:border-0 dark:border-gray-800"
+                  className="p-3 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors border-b last:border-0 dark:border-gray-800"
                   onClick={() => setShowSearch(false)}
                 >
-                  <p className="text-xs max-sm:text-[10px] font-bold text-blue-600 dark:text-blue-400">{msg.sender?.username}</p>
-                  <p className="text-sm max-sm:text-xs text-gray-600 dark:text-gray-300 truncate">{msg.content}</p>
+                  <p className="text-xs font-bold text-blue-600 dark:text-blue-400">{msg.sender?.username}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 truncate">{msg.content}</p>
                 </div>
               ))}
             </div>
@@ -317,7 +320,7 @@ const ChatWindow = ({
       {/* Messages area */}
       <div
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto p-4 max-sm:p-2 space-y-6 bg-gray-50 dark:bg-gray-950 scroll-smooth"
+        className="flex-1 overflow-y-auto px-4 py-4 md:px-5 space-y-6 bg-gray-50 dark:bg-gray-950 scroll-smooth"
       >
         {loadingInitial ? (
           <div className="space-y-6"><Skeleton count={4} height={70} borderRadius={16} /></div>
@@ -328,7 +331,7 @@ const ChatWindow = ({
                 <button
                   onClick={() => fetchMessages(page + 1)}
                   disabled={loading}
-                  className="text-[11px] max-sm:text-[10px] font-bold uppercase tracking-wider bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 px-4 max-sm:px-3 py-2 max-sm:py-1.5 rounded-full shadow-sm border border-gray-100 dark:border-gray-700 hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
+                  className="text-xs font-bold uppercase tracking-wider bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 px-4 py-2 rounded-full shadow-sm border border-gray-100 dark:border-gray-700 hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
                 >
                   {loading ? 'Loading...' : 'Load History'}
                 </button>
@@ -338,8 +341,8 @@ const ChatWindow = ({
             {messagesWithDateHeaders.map((item, index) => {
               if (item.type === 'date') {
                 return (
-                  <div key={`date-${index}`} className="flex justify-center my-6 max-sm:my-4">
-                    <span className="text-[10px] max-sm:text-[9px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-500 bg-gray-200/50 dark:bg-gray-800/50 px-3 max-sm:px-2 py-1 rounded-lg">
+                  <div key={`date-${index}`} className="flex justify-center my-6">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-500 bg-gray-200/50 dark:bg-gray-800/50 px-3 py-1 rounded-lg">
                       {formatDateHeader(item.date)}
                     </span>
                   </div>
@@ -362,11 +365,11 @@ const ChatWindow = ({
             {typingUsers.length > 0 && (
               <div className="flex items-center gap-2 px-2 animate-in fade-in slide-in-from-left-2 duration-300">
                 <div className="flex gap-1">
-                  <span className="w-1.5 h-1.5 max-sm:w-1 max-sm:h-1 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                  <span className="w-1.5 h-1.5 max-sm:w-1 max-sm:h-1 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                  <span className="w-1.5 h-1.5 max-sm:w-1 max-sm:h-1 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                  <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                  <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                  <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
                 </div>
-                <span className="text-xs max-sm:text-[10px] font-medium text-gray-400 italic">
+                <span className="text-xs font-medium text-gray-400 italic">
                   {typingUsers.length === 1
                     ? `${typingUsers[0].username} is typing...`
                     : `${typingUsers.length} people are typing...`}
@@ -379,7 +382,7 @@ const ChatWindow = ({
       </div>
 
       {/* Input area */}
-      <div className="p-3 sm:p-4 max-sm:p-2 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950">
+      <div className="p-3 md:p-4 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950">
         <MessageInput
           conversationId={conversationId}
           onSend={(content, type, mediaUrl) =>
@@ -388,7 +391,7 @@ const ChatWindow = ({
           disabled={blockStatus.hasBlocked || blockStatus.isBlockedBy}
         />
         {(blockStatus.hasBlocked || blockStatus.isBlockedBy) && (
-          <p className="text-[11px] max-sm:text-[10px] text-center text-red-500 font-bold uppercase tracking-tighter mt-2">
+          <p className="text-xs text-center text-red-500 font-bold uppercase tracking-tighter mt-2">
             {blockStatus.hasBlocked ? 'You have blocked this user' : 'You are blocked by this user'}
           </p>
         )}
