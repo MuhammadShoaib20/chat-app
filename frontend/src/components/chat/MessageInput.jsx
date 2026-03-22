@@ -122,7 +122,7 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
           }}
           placeholder="Type a message..."
           rows={1}
-          className="w-full bg-transparent border-none focus:ring-0 resize-none outline-none text-[15px] md:text-base text-gray-800 dark:text-gray-100 px-4 pt-3 pb-1 min-h-[45px] max-h-40 custom-scrollbar"
+          className="w-full bg-transparent border-none focus:ring-0 focus:outline-none resize-none outline-none text-[15px] md:text-base text-gray-800 dark:text-gray-100 px-4 pt-3 pb-1 min-h-[45px] max-h-40 custom-scrollbar"
           disabled={disabled}
         />
 
