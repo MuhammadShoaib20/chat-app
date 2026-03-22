@@ -12,8 +12,12 @@ const MessageActions = ({ onEdit, onDelete, onShare, isOwn, message }) => {
     const rect = menuRef.current.getBoundingClientRect();
     const DROPDOWN_H = 200;
     const DROPDOWN_W = 176;
+    // Open upward if less than DROPDOWN_H space below
     setDropUp(rect.bottom + DROPDOWN_H > window.innerHeight - 16);
-    setAlignLeft(rect.right + DROPDOWN_W > window.innerWidth - 8);
+    // Align to left edge of trigger if dropdown would overflow right side
+    // But since our bubbles are already near right edge on mobile,
+    // check if aligning right (default) would cut off on LEFT side
+    setAlignLeft(rect.left - DROPDOWN_W < 8);
   }, [showMenu]);
 
   // Close on outside click / touch

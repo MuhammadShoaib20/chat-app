@@ -174,10 +174,8 @@ const MessageBubble = ({ message, isOwn, onEdit, onDelete, onAddReaction, showAv
           </span>
         )}
 
-        {/* Bubble + actions row */}
-        <div className="relative flex items-center gap-2 group">
-
-          {/* Message bubble */}
+        {/* Bubble */}
+        <div className="relative">
           <div
             className={`
               relative px-4 py-3 rounded-[1.4rem] shadow-sm transition-all duration-300
@@ -207,10 +205,10 @@ const MessageBubble = ({ message, isOwn, onEdit, onDelete, onAddReaction, showAv
             </div>
           </div>
 
-          {/* Hover action buttons */}
+          {/* Hover action buttons — float above bubble, pinned to correct corner */}
           {!isEditing && message.type !== 'deleted' && (
-            <div className={`flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200 ${
-              isOwn ? 'flex-row-reverse order-first' : ''
+            <div className={`absolute -top-4 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200 z-10 ${
+              isOwn ? 'right-0' : 'left-0'
             }`}>
               <button
                 onClick={() => setShowPicker(!showPicker)}
@@ -220,7 +218,7 @@ const MessageBubble = ({ message, isOwn, onEdit, onDelete, onAddReaction, showAv
                 <span className="text-xs leading-none">😊</span>
               </button>
               {isOwn && (
-                <div className="bg-white dark:bg-gray-800 rounded-full shadow-lg border border-gray-100 dark:border-gray-700">
+                <div className="bg-white dark:bg-gray-800 rounded-full shadow-lg border border-gray-100 dark:border-gray-700 z-20">
                   <MessageActions
                     onEdit={() => setIsEditing(true)}
                     onDelete={() => onDelete(message._id)}
