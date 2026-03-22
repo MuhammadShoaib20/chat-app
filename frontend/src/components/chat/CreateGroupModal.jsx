@@ -10,29 +10,33 @@ const CreateGroupModal = ({ onClose, onGroupCreated }) => {
   const [loading, setLoading] = useState(false);
   const [searching, setSearching] = useState(false);
 
+  // Debounced search
   useEffect(() => {
-    if (searchTerm.trim()) {
-      setSearching(true);
-      const delay = setTimeout(async () => {
-        try {
-          const results = await searchUsers(searchTerm);
-          setUsers(results);
-        } catch (error) {
-          console.error('Search failed:', error);
-        } finally {
-          setSearching(false);
-        }
-      }, 300);
-      return () => clearTimeout(delay);
-    } else {
+    if (!searchTerm.trim()) {
       setUsers([]);
       setSearching(false);
+      return;
     }
+    setSearching(true);
+    const timer = setTimeout(async () => {
+      try {
+        const results = await searchUsers(searchTerm);
+        setUsers(results);
+      } catch (error) {
+        console.error('Search failed:', error);
+      } finally {
+        setSearching(false);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
   }, [searchTerm]);
 
+  // User selection handlers
   const handleSelectUser = (user) => {
     if (!selectedUsers.find(u => u._id === user._id)) {
       setSelectedUsers([...selectedUsers, user]);
+      // Optional: clear search to avoid clutter
+      setSearchTerm('');
     }
   };
 
@@ -40,6 +44,7 @@ const CreateGroupModal = ({ onClose, onGroupCreated }) => {
     setSelectedUsers(selectedUsers.filter(u => u._id !== userId));
   };
 
+  // Create group
   const handleCreate = async () => {
     if (!groupName.trim() || selectedUsers.length < 1) return;
     setLoading(true);
@@ -77,7 +82,7 @@ const CreateGroupModal = ({ onClose, onGroupCreated }) => {
             <button
               onClick={onClose}
               className="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all active:scale-90"
-              aria-label="Close"
+              aria-label="Close modal"
             >
               <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path d="M6 18L18 6M6 6l12 12" />
@@ -88,15 +93,15 @@ const CreateGroupModal = ({ onClose, onGroupCreated }) => {
 
         {/* ── Scrollable Content ── */}
         <div className="flex-1 overflow-y-auto p-5 space-y-5 custom-scrollbar">
-
           {/* Group name */}
           <div>
-            <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-2 ml-1">
+            <label htmlFor="group-name" className="block text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-2 ml-1">
               Group Identity
             </label>
             <input
-              autoFocus
+              id="group-name"
               type="text"
+              autoFocus
               placeholder="Give your group a name..."
               value={groupName}
               onChange={(e) => setGroupName(e.target.value)}
@@ -106,7 +111,7 @@ const CreateGroupModal = ({ onClose, onGroupCreated }) => {
 
           {/* Member search */}
           <div>
-            <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-2 ml-1">
+            <label htmlFor="member-search" className="block text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-2 ml-1">
               Add Members
             </label>
             <div className="relative group">
@@ -125,6 +130,7 @@ const CreateGroupModal = ({ onClose, onGroupCreated }) => {
                 </div>
               )}
               <input
+                id="member-search"
                 type="text"
                 placeholder="Find people..."
                 value={searchTerm}

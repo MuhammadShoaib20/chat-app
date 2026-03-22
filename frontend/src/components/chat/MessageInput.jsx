@@ -18,7 +18,7 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
   const { socket } = useSocket();
   const { darkMode } = useTheme();
 
-  // useEffect for typing indicator cleanup and management
+  // Cleanup typing indicator on unmount
   useEffect(() => {
     return () => {
       if (typingTimeoutRef.current) {
@@ -28,6 +28,7 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
     };
   }, [conversationId, socket]);
 
+  // Auto‑grow textarea
   const adjustHeight = () => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
@@ -35,6 +36,7 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
     }
   };
 
+  // Handle input change with typing indicator
   const handleChange = (e) => {
     setMessage(e.target.value);
     adjustHeight();
@@ -47,11 +49,13 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
     }, 2000);
   };
 
+  // Emoji selection
   const handleEmojiSelect = (emoji) => {
     setMessage((prev) => prev + emoji.native);
     setTimeout(() => adjustHeight(), 0);
   };
 
+  // File attachment
   const handleFileSelect = async (e) => {
     const file = e.target.files?.[0];
     if (!file || disabled) return;
@@ -69,6 +73,7 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
     }
   };
 
+  // Send message
   const handleSubmit = (e) => {
     e.preventDefault();
     if (message.trim() && conversationId && !disabled) {
@@ -102,7 +107,7 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
           : 'border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50'
       }`}>
         
-        {/* Input Area - Box and outlines removed */}
+        {/* Input Area */}
         <textarea
           ref={textareaRef}
           value={message}
@@ -129,6 +134,7 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
               type="button"
               onClick={() => setShowEmojiPicker(!showEmojiPicker)}
               className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full transition-all active:scale-90"
+              aria-label="Open emoji picker"
             >
               <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
@@ -143,6 +149,7 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
               className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full transition-all active:scale-90"
+              aria-label="Attach file"
             >
               {uploading ? (
                 <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
@@ -164,6 +171,7 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
                 ? 'bg-blue-600 text-white shadow-lg active:scale-90' 
                 : 'bg-gray-100 dark:bg-gray-800 text-gray-300 dark:text-gray-600 cursor-not-allowed'
             }`}
+            aria-label="Send message"
           >
             <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" className={message.trim() ? "translate-x-0.5" : ""}>
               <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />

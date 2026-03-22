@@ -96,7 +96,7 @@ const NewChatModal = ({ onClose, onChatCreated }) => {
     <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-md flex items-center justify-center z-[100] p-4 animate-in fade-in duration-300">
       <div className="bg-white dark:bg-gray-900 rounded-[2rem] w-full max-w-md max-h-[88vh] flex flex-col shadow-2xl border border-white/20 dark:border-gray-800 overflow-hidden animate-in zoom-in-95 duration-200">
 
-        {/* ── Header ── */}
+        {/* Header */}
         <div className="px-6 pt-6 pb-3 flex items-start justify-between">
           <div>
             <h3 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight leading-tight">
@@ -117,7 +117,7 @@ const NewChatModal = ({ onClose, onChatCreated }) => {
           </button>
         </div>
 
-        {/* ── Mode Toggle ── */}
+        {/* Mode Toggle */}
         <div className="px-6 mb-4">
           <div className="flex p-1.5 bg-gray-100 dark:bg-gray-800 rounded-2xl relative">
             <button
@@ -145,7 +145,7 @@ const NewChatModal = ({ onClose, onChatCreated }) => {
           </div>
         </div>
 
-        {/* ── Scrollable Body ── */}
+        {/* Scrollable Body */}
         <div className="flex-1 overflow-y-auto px-6 custom-scrollbar">
 
           {/* Group-only fields */}
@@ -274,7 +274,7 @@ const NewChatModal = ({ onClose, onChatCreated }) => {
           </div>
         </div>
 
-        {/* ── Footer ── */}
+        {/* Footer */}
         <div className="px-6 py-5 bg-gray-50 dark:bg-gray-950/50 border-t border-gray-100 dark:border-gray-800 flex gap-3">
           <button
             onClick={onClose}
