@@ -102,10 +102,10 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
       )}
 
       <div className={`max-w-4xl mx-auto transition-all duration-300 border rounded-[28px] p-1.5 ${
-    isFocused 
-      ? 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-none' 
-      : 'border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50'
-  }`}>
+        isFocused 
+          ? 'border-blue-500/30 bg-white dark:bg-gray-900 shadow-xl shadow-blue-500/5' 
+          : 'border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50'
+      }`}>
         
         {/* Input Area */}
         <textarea
