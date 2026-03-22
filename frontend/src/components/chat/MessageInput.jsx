@@ -1,23 +1,18 @@
 import { useState, useRef, useEffect } from 'react';
 import { useSocket } from '../../hooks/useSocket';
-import { useTheme } from '../../context/ThemeContext';
 import { uploadFile } from '../../services/uploadService';
-import Picker from '@emoji-mart/react';
-import data from '@emoji-mart/data';
 import toast from 'react-hot-toast';
 
 const MessageInput = ({ onSend, conversationId, disabled }) => {
   const [message, setMessage] = useState('');
   const [uploading, setUploading] = useState(false);
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   
   const fileInputRef = useRef(null);
   const textareaRef = useRef(null);
   const typingTimeoutRef = useRef(null);
   const { socket } = useSocket();
-  const { darkMode } = useTheme();
 
-  // Cleanup for typing indicators
   useEffect(() => {
     return () => {
       if (typingTimeoutRef.current) {
@@ -30,7 +25,7 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
   const adjustHeight = () => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 160)}px`;
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 150)}px`;
     }
   };
 
@@ -46,15 +41,6 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
     }, 2000);
   };
 
-  const handleEmojiSelect = (emoji) => {
-    setMessage((prev) => prev + emoji.native);
-    setTimeout(() => {
-      adjustHeight();
-      textareaRef.current?.focus();
-    }, 0);
-    setShowEmojiPicker(false);
-  };
-
   const handleFileSelect = async (e) => {
     const file = e.target.files?.[0];
     if (!file || disabled) return;
@@ -63,7 +49,6 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
       const { url, originalName } = await uploadFile(file);
       const isImage = file.type.startsWith('image/');
       onSend(isImage ? '🖼️ Image' : `📎 ${originalName}`, isImage ? 'image' : 'file', url);
-      toast.success('File uploaded');
     } catch (error) {
       console.error(error);
       toast.error('Upload failed');
@@ -79,108 +64,98 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
       onSend(message.trim(), 'text', '');
       setMessage('');
       if (textareaRef.current) textareaRef.current.style.height = 'auto';
-      setShowEmojiPicker(false);
       socket?.emit('typing-stop', { conversationId });
     }
   };
 
-  const canSend = message.trim() && !disabled && !uploading;
-
   return (
-    <div className="flex-shrink-0 relative p-3 md:p-4 bg-white/80 dark:bg-gray-950/80 backdrop-blur-lg border-t border-gray-100 dark:border-gray-800 transition-all duration-300">
-      
-      {/* Emoji Picker - Positioned above with Animation */}
-      {showEmojiPicker && (
-        <div className="absolute bottom-full left-3 md:left-4 mb-3 z-[60] animate-in fade-in slide-in-from-bottom-2 duration-200 shadow-2xl rounded-3xl overflow-hidden border border-gray-100 dark:border-gray-800">
-          <Picker 
-            data={data} 
-            onEmojiSelect={handleEmojiSelect} 
-            theme={darkMode ? 'dark' : 'light'}
-            previewPosition="none"
-            skinTonePosition="none"
-          />
-          <div className="fixed inset-0 z-[-1]" onClick={() => setShowEmojiPicker(false)} />
-        </div>
-      )}
+    <div className="p-3 md:p-4 bg-white dark:bg-gray-950">
+      <div className={`max-w-4xl mx-auto transition-all duration-300 border-2 rounded-[24px] p-2 ${
+        isFocused 
+          ? 'border-blue-500/20 bg-white dark:bg-gray-900 shadow-lg' 
+          : 'border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50'
+      }`}>
+        
+        {/* 1. Textarea Area (Top) */}
+        <textarea
+          ref={textareaRef}
+          value={message}
+          onChange={handleChange}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              handleSubmit(e);
+            }
+          }}
+          placeholder="Message..."
+          rows={1}
+          className="w-full bg-transparent resize-none outline-none text-[15px] md:text-base text-gray-800 dark:text-gray-100 px-3 pt-2 pb-1 min-h-[45px] max-h-40 custom-scrollbar"
+          disabled={disabled}
+        />
 
-      <div className="max-w-7xl mx-auto flex items-end gap-2 md:gap-2.5">
-        <input type="file" ref={fileInputRef} onChange={handleFileSelect} className="hidden" aria-hidden="true" />
-
-        {/* Left Actions */}
-        <div className="flex items-center gap-1 mb-0.5 flex-shrink-0">
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploading || disabled}
-            className="w-10 h-10 flex items-center justify-center rounded-2xl bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all active:scale-90 disabled:opacity-40"
-            aria-label="Attach file"
-          >
-            {uploading ? (
-              <div className="w-4 h-4 border-2 border-blue-500/20 border-t-blue-500 rounded-full animate-spin" />
-            ) : (
-              <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" />
+        {/* 2. Toolbar Area (Bottom) */}
+        <div className="flex items-center justify-between px-1 pb-1">
+          <div className="flex items-center gap-2">
+            {/* DeepThink Button */}
+            <button
+              type="button"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-blue-100 dark:border-blue-900/30 bg-blue-50/50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-sm font-medium hover:bg-blue-100 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
-            )}
-          </button>
+              DeepThink
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-            disabled={disabled}
-            className={`w-10 h-10 flex items-center justify-center rounded-2xl transition-all active:scale-90 ${
-              showEmojiPicker 
-                ? 'bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25' 
-                : 'bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
-            }`}
-            aria-label="Toggle emoji picker"
-          >
-            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="10" /><path d="M8 14s1.5 2 4 2 4-2 4-2" /><circle cx="9" cy="9" r="0.5" fill="currentColor"/><circle cx="15" cy="9" r="0.5" fill="currentColor"/>
-            </svg>
-          </button>
+            {/* Search Button */}
+            <button
+              type="button"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-sm font-medium hover:bg-gray-50 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              Search
+            </button>
+          </div>
+
+          <div className="flex items-center gap-3">
+            {/* Attachment Button */}
+            <input type="file" ref={fileInputRef} onChange={handleFileSelect} className="hidden" />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              className="p-1.5 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors disabled:opacity-50"
+            >
+              {uploading ? (
+                <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.414a4 4 0 00-5.656-5.656l-6.415 6.414a6 6 0 108.486 8.486L20.5 13" />
+                </svg>
+              )}
+            </button>
+
+            {/* Send Button */}
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={!message.trim() || uploading || disabled}
+              className={`w-9 h-9 flex items-center justify-center rounded-full transition-all duration-300 ${
+                message.trim() 
+                  ? 'bg-blue-600 text-white shadow-md active:scale-90' 
+                  : 'bg-blue-100 dark:bg-blue-900/30 text-blue-300 dark:text-blue-800 cursor-not-allowed'
+              }`}
+            >
+              <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path d="M12 19V5m0 0l-7 7m7-7l7 7" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          </div>
         </div>
-
-        {/* Text Input Wrapper */}
-        <div className={`flex-1 relative flex items-center min-w-0 rounded-2xl px-4 py-2 transition-all duration-200 border-2 ${
-          disabled 
-            ? 'bg-gray-50 dark:bg-gray-900 border-transparent opacity-60' 
-            : 'bg-gray-50 dark:bg-gray-900 border-transparent focus-within:border-blue-500/25 focus-within:bg-white dark:focus-within:bg-gray-950 shadow-sm'
-        }`}>
-          <textarea
-            ref={textareaRef}
-            value={message}
-            onChange={handleChange}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSubmit(e);
-              }
-            }}
-            placeholder={disabled ? 'Chat is disabled' : 'Write something...'}
-            disabled={disabled}
-            rows={1}
-            className="w-full bg-transparent resize-none outline-none max-h-40 text-sm md:text-[15px] leading-relaxed text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 py-1.5 custom-scrollbar"
-          />
-        </div>
-
-        {/* Send Button - Responsive Width */}
-        <button
-          type="button"
-          onClick={handleSubmit}
-          disabled={!canSend}
-          className={`h-11 flex-shrink-0 flex items-center justify-center gap-2 bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-bold uppercase tracking-wider text-[10px] rounded-2xl shadow-lg shadow-blue-500/20 transition-all duration-300 ${
-            canSend 
-              ? 'w-11 md:w-auto md:px-5 opacity-100 scale-100 hover:scale-105 active:scale-95' 
-              : 'w-0 opacity-0 scale-75 pointer-events-none overflow-hidden'
-          }`}
-          aria-label="Send message"
-        >
-          <span className="hidden md:block">Send</span>
-          <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" className="rotate-45 -translate-y-0.5">
-            <path d="M12 19V5m0 0l-7 7m7-7l7 7" />
-          </svg>
-        </button>
       </div>
     </div>
   );
