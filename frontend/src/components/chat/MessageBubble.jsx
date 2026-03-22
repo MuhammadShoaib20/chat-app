@@ -225,6 +225,7 @@ const MessageBubble = ({ message, isOwn, onEdit, onDelete, onAddReaction, showAv
                     onEdit={() => setIsEditing(true)}
                     onDelete={() => onDelete(message._id)}
                     isOwn={isOwn}
+                    message={message}
                   />
                 </div>
               )}
