@@ -192,7 +192,7 @@ const ChatWindow = ({
   }
 
   return (
-    <div className="flex flex-col h-full min-h-0 bg-white dark:bg-gray-950 overflow-hidden relative">
+    <div className="flex flex-col h-full bg-white dark:bg-gray-950 relative">
 
       {/* ── Header ── */}
       <div className="flex-shrink-0 z-20 flex items-center justify-between px-4 py-3 md:px-5 md:py-4 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 gap-2">
@@ -369,7 +369,8 @@ const ChatWindow = ({
       {/* ── Messages Area ── */}
       <div
         ref={messagesContainerRef}
-        className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-4 md:px-5 bg-gray-50 dark:bg-gray-950 custom-scrollbar"
+        className="flex-1 overflow-y-scroll overscroll-contain px-4 py-4 md:px-5 bg-gray-50 dark:bg-gray-950 custom-scrollbar"
+        style={{ scrollbarGutter: 'stable' }}
       >
         {loadingInitial ? (
           <div className="space-y-6 p-2">

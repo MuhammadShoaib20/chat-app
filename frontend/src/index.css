@@ -29,6 +29,14 @@
   :focus-visible {
     @apply outline-none ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-950;
   }
+
+  /* Full height chain — ensures h-screen works inside nested flex */
+  html,
+  body,
+  #root {
+    height: 100%;
+    overflow: hidden;
+  }
 }
 
 @layer components {
@@ -44,6 +52,24 @@
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+
+  /* Custom Scrollbar — used on messages area & lists */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #d1d5db transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 dark:bg-gray-700 rounded-full;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400 dark:bg-gray-600;
   }
 }
 
