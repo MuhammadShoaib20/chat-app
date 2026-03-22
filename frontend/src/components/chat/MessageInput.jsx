@@ -1,18 +1,24 @@
 import { useState, useRef, useEffect } from 'react';
 import { useSocket } from '../../hooks/useSocket';
 import { uploadFile } from '../../services/uploadService';
+import Picker from '@emoji-mart/react';
+import data from '@emoji-mart/data';
+import { useTheme } from '../../context/ThemeContext';
 import toast from 'react-hot-toast';
 
 const MessageInput = ({ onSend, conversationId, disabled }) => {
   const [message, setMessage] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   
   const fileInputRef = useRef(null);
   const textareaRef = useRef(null);
   const typingTimeoutRef = useRef(null);
   const { socket } = useSocket();
+  const { darkMode } = useTheme();
 
+  // useEffect for typing indicator cleanup and management
   useEffect(() => {
     return () => {
       if (typingTimeoutRef.current) {
@@ -41,6 +47,11 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
     }, 2000);
   };
 
+  const handleEmojiSelect = (emoji) => {
+    setMessage((prev) => prev + emoji.native);
+    setTimeout(() => adjustHeight(), 0);
+  };
+
   const handleFileSelect = async (e) => {
     const file = e.target.files?.[0];
     if (!file || disabled) return;
@@ -50,7 +61,7 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
       const isImage = file.type.startsWith('image/');
       onSend(isImage ? '🖼️ Image' : `📎 ${originalName}`, isImage ? 'image' : 'file', url);
     } catch (error) {
-      console.error(error);
+      console.error('File upload failed:', error);
       toast.error('Upload failed');
     } finally {
       setUploading(false);
@@ -64,19 +75,34 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
       onSend(message.trim(), 'text', '');
       setMessage('');
       if (textareaRef.current) textareaRef.current.style.height = 'auto';
+      setShowEmojiPicker(false);
       socket?.emit('typing-stop', { conversationId });
     }
   };
 
   return (
-    <div className="p-3 md:p-4 bg-white dark:bg-gray-950">
-      <div className={`max-w-4xl mx-auto transition-all duration-300 border-2 rounded-[24px] p-2 ${
+    <div className="p-3 md:p-4 bg-white dark:bg-gray-950 relative">
+      
+      {/* Emoji Picker Popup */}
+      {showEmojiPicker && (
+        <div className="absolute bottom-full left-4 mb-2 z-50 animate-in fade-in slide-in-from-bottom-2 duration-200">
+          <Picker 
+            data={data} 
+            onEmojiSelect={handleEmojiSelect} 
+            theme={darkMode ? 'dark' : 'light'}
+            previewPosition="none"
+          />
+          <div className="fixed inset-0 z-[-1]" onClick={() => setShowEmojiPicker(false)} />
+        </div>
+      )}
+
+      <div className={`max-w-4xl mx-auto transition-all duration-300 border rounded-[28px] p-1.5 ${
         isFocused 
-          ? 'border-blue-500/20 bg-white dark:bg-gray-900 shadow-lg' 
-          : 'border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50'
+          ? 'border-blue-500/30 bg-white dark:bg-gray-900 shadow-xl shadow-blue-500/5' 
+          : 'border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50'
       }`}>
         
-        {/* 1. Textarea Area (Top) */}
+        {/* Input Area - Box and outlines removed */}
         <textarea
           ref={textareaRef}
           value={message}
@@ -89,72 +115,60 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
               handleSubmit(e);
             }
           }}
-          placeholder="Message..."
+          placeholder="Type a message..."
           rows={1}
-          className="w-full bg-transparent resize-none outline-none text-[15px] md:text-base text-gray-800 dark:text-gray-100 px-3 pt-2 pb-1 min-h-[45px] max-h-40 custom-scrollbar"
+          className="w-full bg-transparent border-none focus:ring-0 resize-none outline-none text-[15px] md:text-base text-gray-800 dark:text-gray-100 px-4 pt-3 pb-1 min-h-[45px] max-h-40 custom-scrollbar"
           disabled={disabled}
         />
 
-        {/* 2. Toolbar Area (Bottom) */}
-        <div className="flex items-center justify-between px-1 pb-1">
-          <div className="flex items-center gap-2">
-            {/* DeepThink Button */}
+        {/* Bottom Toolbar */}
+        <div className="flex items-center justify-between px-2 pb-1.5">
+          <div className="flex items-center gap-1">
+            {/* Emoji Button */}
             <button
               type="button"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-blue-100 dark:border-blue-900/30 bg-blue-50/50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-sm font-medium hover:bg-blue-100 transition-colors"
+              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+              className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full transition-all active:scale-90"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
+                <path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-              DeepThink
             </button>
 
-            {/* Search Button */}
-            <button
-              type="button"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-sm font-medium hover:bg-gray-50 transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              Search
-            </button>
-          </div>
-
-          <div className="flex items-center gap-3">
             {/* Attachment Button */}
             <input type="file" ref={fileInputRef} onChange={handleFileSelect} className="hidden" />
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
-              className="p-1.5 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors disabled:opacity-50"
+              className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full transition-all active:scale-90"
             >
               {uploading ? (
                 <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
               ) : (
                 <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.414a4 4 0 00-5.656-5.656l-6.415 6.414a6 6 0 108.486 8.486L20.5 13" />
+                  <path d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.414a4 4 0 00-5.656-5.656l-6.415 6.414a6 6 0 108.486 8.486L20.5 13" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               )}
             </button>
-
-            {/* Send Button */}
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={!message.trim() || uploading || disabled}
-              className={`w-9 h-9 flex items-center justify-center rounded-full transition-all duration-300 ${
-                message.trim() 
-                  ? 'bg-blue-600 text-white shadow-md active:scale-90' 
-                  : 'bg-blue-100 dark:bg-blue-900/30 text-blue-300 dark:text-blue-800 cursor-not-allowed'
-              }`}
-            >
-              <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path d="M12 19V5m0 0l-7 7m7-7l7 7" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
           </div>
+
+          {/* Send Button */}
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={!message.trim() || uploading || disabled}
+            className={`w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300 ${
+              message.trim() 
+                ? 'bg-blue-600 text-white shadow-lg active:scale-90' 
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-300 dark:text-gray-600 cursor-not-allowed'
+            }`}
+          >
+            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" className={message.trim() ? "translate-x-0.5" : ""}>
+              <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
         </div>
       </div>
     </div>
