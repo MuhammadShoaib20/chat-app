@@ -88,7 +88,7 @@ const ConversationList = ({ selectedId, onSelectConversation }) => {
     return `${diffDays}d`;
   };
 
-  /* ── Loading skeleton ── */
+  /* Loading skeleton */
   if (loading) {
     return (
       <div className="p-4 space-y-3 bg-white dark:bg-gray-950 h-full">
@@ -107,8 +107,7 @@ const ConversationList = ({ selectedId, onSelectConversation }) => {
 
   return (
     <div className="h-full flex flex-col bg-white dark:bg-gray-950 border-r border-gray-100 dark:border-gray-800">
-
-      {/* ── Header ── */}
+      {/* Header (sticky) */}
       <div className="sticky top-0 z-10 px-4 py-4 flex items-center justify-between bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
         <h1 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">Chats</h1>
         <button
@@ -122,7 +121,7 @@ const ConversationList = ({ selectedId, onSelectConversation }) => {
         </button>
       </div>
 
-      {/* ── Conversation List ── */}
+      {/* Conversation List – scrollable area */}
       <div className="flex-1 overflow-y-auto custom-scrollbar">
         {conversations.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-gray-400 dark:text-gray-600 p-8 text-center animate-in fade-in duration-500">
@@ -243,7 +242,7 @@ const ConversationList = ({ selectedId, onSelectConversation }) => {
         )}
       </div>
 
-      {/* ── Footer / User Card ── */}
+      {/* Footer / User Card (fixed at bottom) */}
       <div className="p-3">
         <div className="bg-gray-50 dark:bg-gray-900/60 rounded-2xl border border-gray-100 dark:border-gray-800 px-3 py-2.5 flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white text-xs font-black ring-2 ring-white dark:ring-gray-800 flex-shrink-0">
@@ -268,7 +267,7 @@ const ConversationList = ({ selectedId, onSelectConversation }) => {
         </div>
       </div>
 
-      {/* ── New Chat Modal ── */}
+      {/* New Chat Modal */}
       {showNewChat && (
         <NewChatModal
           onClose={() => setShowNewChat(false)}
