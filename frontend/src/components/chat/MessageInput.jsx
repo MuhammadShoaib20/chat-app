@@ -19,7 +19,7 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
   const adjustHeight = () => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 160)}px`;
     }
   };
 
@@ -39,6 +39,7 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
     setMessage((prev) => prev + emoji.native);
     setTimeout(adjustHeight, 0);
     setShowEmojiPicker(false);
+    textareaRef.current?.focus();
   };
 
   const handleFileSelect = async (e) => {
@@ -63,7 +64,7 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (message.trim() && conversationId && !disabled) {
-      onSend(message, 'text', '');
+      onSend(message.trim(), 'text', '');
       setMessage('');
       if (textareaRef.current) textareaRef.current.style.height = 'auto';
       setShowEmojiPicker(false);
@@ -80,11 +81,14 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
     };
   }, [conversationId, socket]);
 
+  const canSend = message.trim() && !disabled && !uploading;
+
   return (
     <div className="relative p-3 md:p-4 bg-white/80 dark:bg-gray-950/80 backdrop-blur-lg border-t border-gray-100 dark:border-gray-800">
-      {/* Emoji Picker Modal */}
+
+      {/* Emoji picker */}
       {showEmojiPicker && (
-        <div className="absolute bottom-full left-4 mb-4 z-[60] animate-in fade-in slide-in-from-bottom-2 duration-200 shadow-2xl rounded-3xl overflow-hidden border border-gray-100 dark:border-gray-800">
+        <div className="absolute bottom-full left-3 md:left-4 mb-3 z-[60] animate-in fade-in slide-in-from-bottom-2 duration-200 shadow-2xl rounded-3xl overflow-hidden border border-gray-100 dark:border-gray-800">
           <Picker
             data={data}
             onEmojiSelect={handleEmojiSelect}
@@ -96,76 +100,106 @@ const MessageInput = ({ onSend, conversationId, disabled }) => {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="max-w-7xl mx-auto flex items-end gap-2 md:gap-3">
+      <div className="max-w-7xl mx-auto flex items-end gap-2 md:gap-2.5">
         <input
           type="file"
           ref={fileInputRef}
           onChange={handleFileSelect}
           className="hidden"
           disabled={disabled}
+          aria-hidden="true"
         />
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-1.5 mb-0.5">
+        {/* Left action buttons */}
+        <div className="flex items-center gap-1 mb-0.5 flex-shrink-0">
+          {/* Attach */}
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading || disabled}
-            className="w-10 h-10 flex items-center justify-center rounded-2xl bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-all active:scale-90 disabled:opacity-50"
+            className="w-10 h-10 flex items-center justify-center rounded-2xl bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all active:scale-90 disabled:opacity-40"
             title="Attach file"
             aria-label="Attach file"
           >
             {uploading ? (
-              <div className="w-5 h-5 border-2 border-blue-500/20 border-t-blue-500 rounded-full animate-spin" />
+              <div className="w-4 h-4 border-2 border-blue-500/20 border-t-blue-500 rounded-full animate-spin" />
             ) : (
-              <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" /></svg>
+              <svg width="19" height="19" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" />
+              </svg>
             )}
           </button>
 
+          {/* Emoji */}
           <button
             type="button"
             onClick={() => setShowEmojiPicker(!showEmojiPicker)}
             disabled={disabled}
             className={`w-10 h-10 flex items-center justify-center rounded-2xl transition-all active:scale-90 ${
               showEmojiPicker
-                ? 'bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/30'
-                : 'bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600'
+                ? 'bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25'
+                : 'bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400'
             }`}
-            aria-label="Emoji picker"
+            aria-label="Toggle emoji picker"
           >
-            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M8 14s1.5 2 4 2 4-2 4-2" /><line x1="9" y1="9" x2="9.01" y2="9" /><line x1="15" y1="9" x2="15.01" y2="9" /></svg>
+            <svg width="19" height="19" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+              <line x1="9" y1="9" x2="9.01" y2="9" strokeLinecap="round" strokeWidth="3" />
+              <line x1="15" y1="9" x2="15.01" y2="9" strokeLinecap="round" strokeWidth="3" />
+            </svg>
           </button>
         </div>
 
-        {/* Text Area */}
-        <div className={`flex-1 relative flex items-center min-w-0 rounded-2xl px-4 py-2.5 transition-all duration-300 border-2 ${
+        {/* Text input */}
+        <div className={`flex-1 relative flex items-center min-w-0 rounded-2xl px-4 py-2.5 transition-all duration-200 border-2 ${
           disabled
-            ? 'bg-gray-50 dark:bg-gray-900 border-transparent'
-            : 'bg-gray-50 dark:bg-gray-900 border-transparent focus-within:border-blue-500/30 focus-within:bg-white dark:focus-within:bg-gray-950 shadow-inner'
+            ? 'bg-gray-50 dark:bg-gray-900 border-transparent opacity-60'
+            : 'bg-gray-50 dark:bg-gray-900 border-transparent focus-within:border-blue-500/25 focus-within:bg-white dark:focus-within:bg-gray-950'
         }`}>
           <textarea
             ref={textareaRef}
             value={message}
             onChange={handleChange}
-            onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSubmit(e)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSubmit(e);
+              }
+            }}
             placeholder={disabled ? 'Chat is disabled' : 'Write something...'}
             disabled={disabled}
             rows={1}
-            className="w-full bg-transparent resize-none outline-none max-h-40 text-sm md:text-base leading-relaxed text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 custom-scrollbar py-1"
+            className="w-full bg-transparent resize-none outline-none max-h-40 text-sm md:text-[15px] leading-relaxed text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 custom-scrollbar py-0.5"
           />
         </div>
 
-        {/* Send Button */}
+        {/* Send button */}
         <button
-          type="submit"
-          disabled={!message.trim() || disabled || uploading}
-          className="h-12 w-12 md:w-auto md:px-6 flex-shrink-0 flex items-center justify-center gap-2 bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-black uppercase tracking-widest text-xs rounded-2xl shadow-xl shadow-blue-500/20 hover:scale-105 active:scale-95 transition-all disabled:opacity-0 disabled:scale-90 disabled:pointer-events-none"
+          type="button"
+          onClick={handleSubmit}
+          disabled={!canSend}
+          className={`h-11 w-11 md:w-auto md:px-5 flex-shrink-0 flex items-center justify-center gap-2 bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-black uppercase tracking-wider text-xs rounded-2xl shadow-lg shadow-blue-500/20 transition-all ${
+            canSend
+              ? 'hover:scale-105 active:scale-95 opacity-100'
+              : 'opacity-0 scale-90 pointer-events-none'
+          }`}
           aria-label="Send message"
         >
           <span className="hidden md:block">Send</span>
-          <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" className="transform rotate-45 -translate-y-0.5"><path d="M12 19V5m0 0l-7 7m7-7l7 7" /></svg>
+          <svg
+            width="17"
+            height="17"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="3"
+            viewBox="0 0 24 24"
+            style={{ transform: 'rotate(45deg) translateY(-1px)' }}
+          >
+            <path d="M12 19V5m0 0l-7 7m7-7l7 7" />
+          </svg>
         </button>
-      </form>
+      </div>
     </div>
   );
 };
