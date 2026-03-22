@@ -205,10 +205,10 @@ const MessageBubble = ({ message, isOwn, onEdit, onDelete, onAddReaction, showAv
             </div>
           </div>
 
-          {/* Hover action buttons — float above bubble, pinned to correct corner */}
+          {/* Hover action buttons */}
           {!isEditing && message.type !== 'deleted' && (
-            <div className={`absolute -top-4 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200 z-10 ${
-              isOwn ? 'right-0' : 'left-0'
+            <div className={`absolute top-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200 z-10 ${
+              isOwn ? 'right-1' : 'left-1'
             }`}>
               <button
                 onClick={() => setShowPicker(!showPicker)}
