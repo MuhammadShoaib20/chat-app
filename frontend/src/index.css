@@ -7,26 +7,20 @@
     color-scheme: light dark;
   }
 
-  body {
-    @apply bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 antialiased selection:bg-blue-500 selection:text-white transition-colors duration-300;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  html {
+    scroll-behavior: smooth;
   }
 
- /* ✅ CORRECTED VERSION */
-html {
-  scroll-behavior: smooth;
-}
+  body {
+    @apply bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    min-height: 100vh;
+  }
 
-body {
-  @apply bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 antialiased;
-  min-height: 100vh;
-  /* overflow: hidden; ko yahan se bilkul hata dein */
-}
+  #root {
+    min-height: 100%;
+  }
 
-#root {
-  min-height: 100%;
-}
-  /* Focus States */
   :focus-visible {
     @apply outline-none ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-950;
   }
@@ -37,15 +31,14 @@ body {
     @apply bg-white/70 dark:bg-gray-900/70 backdrop-blur-md border border-white/20 dark:border-gray-800;
   }
 
-  /* Optimized Custom Scrollbar */
   .custom-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
-    scroll-behavior: smooth; /* Smooth scrolling for chat */
+    scrollbar-color: rgba(156, 163, 175, 0.4) transparent;
+    scroll-behavior: smooth;
   }
 
   .custom-scrollbar::-webkit-scrollbar {
-    width: 6px; /* 4px thoda patla tha, 6px is better for usability */
+    width: 5px;
   }
 
   .custom-scrollbar::-webkit-scrollbar-track {
@@ -53,10 +46,40 @@ body {
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    @apply bg-gray-300/60 dark:bg-gray-700/60 rounded-full hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors;
+    @apply bg-gray-300/50 dark:bg-gray-700/50 rounded-full;
+    transition: background 0.2s;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400 dark:bg-gray-600;
+  }
+
+  .btn-primary {
+    @apply px-5 py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold rounded-xl shadow-md shadow-blue-500/20 transition-all duration-200 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .input-base {
+    @apply w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200;
   }
 }
 
 /* Animations */
-@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
-.animate-fade-in { animation: fade-in 0.3s ease-out forwards; }
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes blob {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(30px, -20px) scale(1.05); }
+  66%       { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+.animate-fade-in  { animation: fade-in  0.35s ease-out forwards; }
+.animate-slide-up { animation: slide-up 0.4s  ease-out forwards; }
+.animate-blob     { animation: blob     7s    ease-in-out infinite; }
+.animation-delay-2000 { animation-delay: 2s; }
+.animation-delay-4000 { animation-delay: 4s; }

@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import ConversationList from "../components/chat/ConversationList";
-import ChatWindow from "../components/chat/ChatWindow";
-import GroupInfoPanel from "../components/chat/GroupInfoPanel";
-import { useSocket } from "../hooks/useSocket";
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import ConversationList from '../components/chat/ConversationList';
+import ChatWindow from '../components/chat/ChatWindow';
+import GroupInfoPanel from '../components/chat/GroupInfoPanel';
+import { useSocket } from '../hooks/useSocket';
 
 const ChatPage = () => {
   const [selectedId, setSelectedId] = useState(null);
@@ -24,117 +24,110 @@ const ChatPage = () => {
       if (String(conv?._id) !== String(selectedId)) return;
       setSelectedConv((prev) => ({ ...(prev || {}), ...conv }));
     };
-    socket.on("conversation-updated", onConversationUpdated);
-    return () => socket.off("conversation-updated", onConversationUpdated);
+    socket.on('conversation-updated', onConversationUpdated);
+    return () => socket.off('conversation-updated', onConversationUpdated);
   }, [socket, selectedId]);
 
   return (
-    <div className="flex h-screen bg-gray-100 dark:bg-gray-950 overflow-hidden font-sans relative text-gray-900 dark:text-gray-100 selection:bg-blue-100 dark:selection:bg-blue-900/30">
-      
-      {/* 1. Backdrop Overlay (Mobile Only) - Added Fade Animation */}
+    <div className="flex h-screen bg-gray-100 dark:bg-gray-950 overflow-hidden relative transition-colors duration-300">
+
+      {/* Mobile backdrop */}
       {showSidebar && (
         <div
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[45] lg:hidden transition-all duration-300 opacity-100"
+          className="fixed inset-0 bg-black/50 backdrop-blur-[2px] z-[45] lg:hidden"
           onClick={() => setShowSidebar(false)}
         />
       )}
 
-      {/* 2. Sidebar - Added ease-in-out and Shadow Transitions */}
+      {/* Sidebar */}
       <aside
         className={`
-          fixed inset-y-0 left-0 z-[50] w-72 lg:w-80 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800
-          transition-all duration-500 cubic-bezier(0.4, 0, 0.2, 1)
-          ${showSidebar ? "translate-x-0 shadow-2xl" : "-translate-x-full lg:translate-x-0 lg:static lg:block"}
-          ${!showSidebar && "lg:hidden opacity-0 lg:opacity-100"} 
+          fixed inset-y-0 left-0 z-50 w-[300px] sm:w-80 lg:static lg:flex flex-col flex-shrink-0
+          bg-white dark:bg-gray-950 border-r border-gray-100 dark:border-gray-800
+          transition-transform duration-300 ease-in-out
+          ${showSidebar ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0'}
         `}
       >
-        <div className="flex flex-col h-full">
-          {/* Sidebar Header */}
-          <div className="p-5 flex justify-between items-center border-b border-gray-100 dark:border-gray-800">
-            <div className="flex items-center gap-3 group">
-              <Link
-                to="/"
-                className="p-2 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:rotate-12 transition-all duration-300"
-                title="Home"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                </svg>
-              </Link>
-              <h2 className="text-xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-500 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
-                SyncChat
-              </h2>
-            </div>
-            
-            <button
-              onClick={() => setShowSidebar(false)}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-all active:scale-90 text-gray-400 hover:text-red-500"
-            >
-              <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path d="M6 18L18 6M6 6l12 12" />
+        {/* Sidebar header (mobile close + branding) */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex-shrink-0">
+          <Link to="/" className="flex items-center gap-2 group">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform duration-200">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
               </svg>
-            </button>
-          </div>
+            </div>
+            <span className="font-black text-base tracking-tight text-gray-900 dark:text-white">Sync<span className="text-blue-600">Chat</span></span>
+          </Link>
+          <button
+            onClick={() => setShowSidebar(false)}
+            className="lg:hidden p-2 rounded-xl text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200"
+            aria-label="Close sidebar"
+          >
+            <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
 
-          <div className="flex-1 overflow-y-auto custom-scrollbar">
-            <ConversationList
-              selectedId={selectedId}
-              onSelectConversation={handleSelectConversation}
-            />
-          </div>
+        {/* Conversation list */}
+        <div className="flex-1 overflow-hidden">
+          <ConversationList
+            selectedId={selectedId}
+            onSelectConversation={handleSelectConversation}
+          />
         </div>
       </aside>
 
-      {/* 3. Main Content Area */}
-      <main className="flex-1 flex flex-col min-w-0 bg-gray-50 dark:bg-gray-950 relative h-full">
-        
-        {/* Animated Toggle Button */}
+      {/* Main content */}
+      <main className="flex-1 flex flex-col min-w-0 relative overflow-hidden">
+
+        {/* Mobile toggle button (only when sidebar is closed) */}
         {!showSidebar && (
           <button
             onClick={() => setShowSidebar(true)}
-            className="fixed top-4 left-4 z-40 p-3 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-2xl border border-gray-200 dark:border-gray-800 shadow-lg hover:shadow-blue-500/10 transition-all duration-300 active:scale-90 animate-in slide-in-from-left-4 fade-in"
+            className="lg:hidden fixed top-3.5 left-3.5 z-40 w-10 h-10 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg flex items-center justify-center text-blue-600 dark:text-blue-400 hover:shadow-blue-500/10 hover:border-blue-300 dark:hover:border-blue-700 transition-all duration-200 active:scale-95"
+            aria-label="Open sidebar"
           >
-            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="text-blue-500">
-              <path d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
         )}
 
-        <div className="flex-1 flex flex-col h-full w-full max-w-[1600px] mx-auto overflow-hidden transition-all duration-500">
-          {selectedId ? (
-            <div className="flex-1 flex flex-col animate-in fade-in slide-in-from-bottom-2 duration-500">
-              <ChatWindow
-                conversationId={selectedId}
-                conversation={selectedConv}
-                onOpenInfo={() => setShowInfoPanel(true)}
-                onOpenSidebar={() => setShowSidebar(true)}
-              />
+        {selectedId ? (
+          <ChatWindow
+            conversationId={selectedId}
+            conversation={selectedConv}
+            onOpenInfo={() => setShowInfoPanel(true)}
+            onOpenSidebar={() => setShowSidebar(true)}
+          />
+        ) : (
+          /* Empty state */
+          <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
+            <div className="w-20 h-20 mb-6 rounded-[1.8rem] bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-xl shadow-blue-500/25">
+              <svg width="36" height="36" fill="none" stroke="white" strokeWidth="1.5" viewBox="0 0 24 24">
+                <path d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25-9 3.694-9 8.25c0 1.618.504 3.12 1.365 4.365L3 20.25l4.365-1.365A8.947 8.947 0 0012 20.25z" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
             </div>
-          ) : (
-            /* Empty State with Soft Animation */
-            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center animate-in fade-in zoom-in-95 duration-700">
-              <div className="w-24 h-24 mb-8 rounded-[2rem] bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center shadow-2xl shadow-blue-500/20 animate-bounce-slow">
-                <svg width="40" height="40" fill="none" stroke="white" strokeWidth="1.5" viewBox="0 0 24 24">
-                  <path d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25-9 3.694-9 8.25c0 1.618.504 3.12 1.365 4.365L3 20.25l4.365-1.365A8.947 8.947 0 0012 20.25z" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold mb-3 tracking-tight">Connect Instantly</h3>
-              <p className="text-base text-gray-500 dark:text-gray-400 max-w-sm leading-relaxed font-light">
-                Pick a friend from the list or start a new group conversation to get started.
-              </p>
-            </div>
-          )}
-        </div>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Your messages</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs leading-relaxed">
+              Select a conversation from the sidebar or start a new one to begin chatting.
+            </p>
+            <button
+              onClick={() => setShowSidebar(true)}
+              className="lg:hidden mt-6 px-5 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 active:scale-95 transition-all duration-200 shadow-md shadow-blue-500/20"
+            >
+              Open Conversations
+            </button>
+          </div>
+        )}
       </main>
 
-      {/* 4. Info Panel - Enhanced Slide and Blur */}
+      {/* Group info panel */}
       {showInfoPanel && selectedConv?.isGroup && (
         <>
-          <div
-            className="fixed inset-0 bg-black/10 backdrop-blur-[2px] z-[55] lg:hidden transition-opacity duration-300"
-            onClick={() => setShowInfoPanel(false)}
-          />
-          <div className="fixed inset-y-0 right-0 z-[60] w-full sm:w-80 lg:w-96 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-l border-gray-200 dark:border-gray-800 shadow-[0_0_50px_rgba(0,0,0,0.1)] animate-in slide-in-from-right duration-500 ease-out">
+          <div className="fixed inset-0 bg-black/20 backdrop-blur-[2px] z-[55] lg:hidden" onClick={() => setShowInfoPanel(false)} />
+          <div className="fixed inset-y-0 right-0 z-[60] w-full sm:w-80 lg:w-96 bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800 shadow-2xl transition-colors duration-300 animate-fade-in">
             <GroupInfoPanel
               conversation={selectedConv}
               onClose={() => setShowInfoPanel(false)}
