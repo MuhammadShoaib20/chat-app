@@ -9,8 +9,8 @@ const MessageActions = memo(({ onEdit, onDelete, onReaction, isOwn, message, chi
   const buttonRef = useRef(null);
 
   const quickEmojis = ['❤️', '👍', '😂', '😮', '😢', '🙏'];
+  const mediaUrl = message?.fileUrl || message?.mediaUrl;
 
-  // Handle Click Outside
   useEffect(() => {
     const closeAll = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target) && 
@@ -23,10 +23,10 @@ const MessageActions = memo(({ onEdit, onDelete, onReaction, isOwn, message, chi
     return () => document.removeEventListener('mousedown', closeAll);
   }, [showMenu]);
 
-  // Position Logic
   useEffect(() => {
     if (showMenu && menuRef.current) {
       const rect = menuRef.current.getBoundingClientRect();
+      // Dropup logic based on screen height
       setDropUp(window.innerHeight - rect.bottom < (showFullPicker ? 450 : 250));
     }
   }, [showMenu, showFullPicker]);
@@ -37,9 +37,46 @@ const MessageActions = memo(({ onEdit, onDelete, onReaction, isOwn, message, chi
     setShowFullPicker(false);
   };
 
+  const handleDownload = async () => {
+    if (!mediaUrl) return;
+    try {
+      const res = await fetch(mediaUrl);
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = message.fileOriginalName || 'download';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url); // Clean up memory
+    } catch (err) {
+      console.error("Download failed, opening in new tab:", err);
+      window.open(mediaUrl, '_blank');
+    }
+    setShowMenu(false);
+  };
+
+  const handleShare = async () => {
+    const text = message?.content || '';
+    const url = mediaUrl || window.location.href;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: 'Shared Message', text: text, url: url });
+      } else {
+        await navigator.clipboard.writeText(`${text} ${url}`);
+        // Simple feedback
+        console.log('Link copied to clipboard');
+      }
+    } catch (err) { 
+      console.error('Sharing failed:', err); 
+    }
+    setShowMenu(false);
+  };
+
   return (
     <div className="relative group flex items-center">
-      {/* 3-Dot Button: Message ke side mein show hoga center par */}
+      {/* 3-Dot Toggle */}
       <button
         ref={buttonRef}
         onClick={(e) => { e.stopPropagation(); setShowMenu(!showMenu); }}
@@ -52,20 +89,18 @@ const MessageActions = memo(({ onEdit, onDelete, onReaction, isOwn, message, chi
         </svg>
       </button>
 
-      {/* Message Content */}
       {children}
 
-      {/* Dropdown Menu */}
       {showMenu && (
         <div
           ref={menuRef}
-          className={`absolute z-[100] min-w-[240px] transition-all duration-200 ${
+          className={`absolute z-[100] min-w-[220px] transition-all duration-200 ${
             dropUp ? 'bottom-full mb-2' : 'top-full mt-2'
           } ${isOwn ? 'right-0' : 'left-0'}`}
         >
           {!showFullPicker ? (
             <div className="bg-white dark:bg-gray-900 shadow-2xl rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">
-              {/* Quick Emojis */}
+              {/* Reaction Bar */}
               <div className="flex items-center justify-between p-2.5 bg-gray-50 dark:bg-white/5 border-b dark:border-gray-800">
                 {quickEmojis.map((emoji) => (
                   <button key={emoji} onClick={() => handleEmojiSelect(emoji)} className="text-2xl hover:scale-125 transition-transform active:scale-90">{emoji}</button>
@@ -73,21 +108,28 @@ const MessageActions = memo(({ onEdit, onDelete, onReaction, isOwn, message, chi
                 <button onClick={() => setShowFullPicker(true)} className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xl hover:bg-blue-500 hover:text-white transition-colors">+</button>
               </div>
 
-              {/* Actions */}
+              {/* Action List */}
               <div className="p-1.5 space-y-0.5">
-                <button onClick={() => { navigator.clipboard.writeText(message?.content); setShowMenu(false); }} className="w-full text-left px-4 py-2 text-sm font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl">Copy</button>
+                <button onClick={() => { navigator.clipboard.writeText(message?.content || ''); setShowMenu(false); }} className="w-full text-left px-4 py-2 text-sm font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl">Copy Text</button>
+                
+                <button onClick={handleShare} className="w-full text-left px-4 py-2 text-sm font-semibold text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-xl">Share / Link</button>
+                
+                {mediaUrl && (
+                  <button onClick={handleDownload} className="w-full text-left px-4 py-2 text-sm font-semibold text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl">Download</button>
+                )}
+
                 {isOwn && (
                   <>
-                    <button onClick={() => { onEdit(); setShowMenu(false); }} className="w-full text-left px-4 py-2 text-sm font-semibold text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl">Edit</button>
-                    <div className="h-px bg-gray-100 dark:border-gray-800 my-1 mx-2" />
+                    <div className="h-px bg-gray-100 dark:bg-gray-800 my-1 mx-2" />
+                    <button onClick={() => { onEdit(); setShowMenu(false); }} className="w-full text-left px-4 py-2 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl">Edit</button>
                     <button onClick={() => { onDelete(); setShowMenu(false); }} className="w-full text-left px-4 py-2 text-sm font-semibold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl">Delete</button>
                   </>
                 )}
               </div>
             </div>
           ) : (
-            <div className="shadow-2xl rounded-2xl overflow-hidden border dark:border-gray-700">
-              <EmojiPicker onEmojiClick={handleEmojiSelect} theme="auto" width={300} height={400} skinTonesDisabled={true} searchDisabled={false} />
+            <div className="shadow-2xl rounded-2xl overflow-hidden border dark:border-gray-700 bg-white">
+              <EmojiPicker onEmojiClick={handleEmojiSelect} theme="auto" width={300} height={400} skinTonesDisabled={true} />
             </div>
           )}
         </div>
