@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ```markdown
 # SyncChat – Backend
 
@@ -48,7 +47,7 @@ This is the backend for a real-time chat application built with the **MERN stack
 
 - Node.js **v18 or higher**
 - MongoDB (local or Atlas)
-- Redis (optional – for production scaling; we provide a sample Redis Cloud URL)
+- Redis (optional – for production scaling)
 - Cloudinary account (optional – for cloud file storage)
 
 ---
@@ -70,7 +69,7 @@ npm install
 
 **3. Set up environment variables:**
 
-Create a `.env` file in the root of the `backend/` folder with the following variables. Replace the placeholder values with your actual credentials.
+Create a `.env` file in the root of the `backend/` folder with the following variables. Replace placeholder values with your actual credentials.
 
 ```env
 # Server
@@ -105,6 +104,7 @@ VAPID_PRIVATE_KEY=your_private_key
 > - If you don’t set Cloudinary keys, files will be saved locally in the `uploads/` folder.
 > - Redis is optional but recommended for scaling Socket.io and caching. The `REDIS_URL` should be a full connection string (including password if any). For Redis Cloud, it usually looks like `redis://:password@host:port`.
 > - For production, use MongoDB Atlas and set `MONGO_URI` accordingly.
+> - Set `CLIENT_URL` to your actual frontend domain(s) (comma‑separated if multiple).
 
 **4. Start MongoDB and Redis** (if using locally):
 
@@ -328,6 +328,3 @@ This project is licensed under the **MIT License** – see the [LICENSE](LICENSE
 
 <div align="center">Built with ❤️ by <a href="https://github.com/MuhammadShoaib20">Muhammad Shoaib</a></div>
 ```
-=======
-
->>>>>>> c06ed55a97d8efca1bdc7f2754d77fa055c12b69
