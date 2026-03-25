@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ```markdown
 # SyncChat – Backend
 
@@ -327,3 +328,6 @@ This project is licensed under the **MIT License** – see the [LICENSE](LICENSE
 
 <div align="center">Built with ❤️ by <a href="https://github.com/MuhammadShoaib20">Muhammad Shoaib</a></div>
 ```
+=======
+
+>>>>>>> c06ed55a97d8efca1bdc7f2754d77fa055c12b69
