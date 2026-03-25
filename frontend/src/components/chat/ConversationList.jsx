@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+// ConversationList.jsx (updated)
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getConversations } from '../../services/conversationService';
 import { useSocketEvent } from '../../hooks/useSocketEvents';
@@ -20,6 +21,32 @@ const ConversationList = ({ selectedId, onSelectConversation }) => {
   const { onlineUsers } = useSocket();
   const { darkMode } = useTheme();
   const navigate = useNavigate();
+  const containerRef = useRef(null);
+  const [mobileHeight, setMobileHeight] = useState(null);
+
+  // Dynamically set container height on mobile to ensure scrolling works
+  useEffect(() => {
+    const isMobile = window.innerWidth < 768;
+    if (!isMobile) {
+      setMobileHeight(null);
+      return;
+    }
+
+    const updateHeight = () => {
+      if (containerRef.current) {
+        containerRef.current.style.height = `${window.innerHeight}px`;
+        setMobileHeight(window.innerHeight);
+      }
+    };
+
+    updateHeight();
+    window.addEventListener('resize', updateHeight);
+    window.addEventListener('orientationchange', updateHeight);
+    return () => {
+      window.removeEventListener('resize', updateHeight);
+      window.removeEventListener('orientationchange', updateHeight);
+    };
+  }, []);
 
   useEffect(() => {
     fetchConversations();
@@ -121,8 +148,14 @@ const ConversationList = ({ selectedId, onSelectConversation }) => {
   }
 
   return (
-    <div className="flex flex-col bg-white dark:bg-gray-950 transition-colors duration-300" style={{ height: '100%', minHeight: 0 }}>
-
+    <div
+      ref={containerRef}
+      className="flex flex-col bg-white dark:bg-gray-950 transition-colors duration-300"
+      style={{
+        height: mobileHeight ? `${mobileHeight}px` : '100%',
+        minHeight: 0,
+      }}
+    >
       {/* Top: title + new chat button */}
       <div className="px-4 pt-3 pb-2 flex items-center justify-between">
         <h2 className="text-lg font-black text-gray-900 dark:text-white tracking-tight">Messages</h2>

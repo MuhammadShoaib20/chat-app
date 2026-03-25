@@ -1,113 +1,99 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, memo } from 'react';
+import EmojiPicker from 'emoji-picker-react';
 
-const MessageActions = ({ onEdit, onDelete, onShare, isOwn, message }) => {
+const MessageActions = memo(({ onEdit, onDelete, onReaction, isOwn, message, children }) => {
   const [showMenu, setShowMenu] = useState(false);
+  const [showFullPicker, setShowFullPicker] = useState(false);
   const [dropUp, setDropUp] = useState(false);
-  const [alignLeft, setAlignLeft] = useState(false);
   const menuRef = useRef(null);
+  const buttonRef = useRef(null);
 
+  const quickEmojis = ['❤️', '👍', '😂', '😮', '😢', '🙏'];
+
+  // Handle Click Outside
   useEffect(() => {
-    if (!showMenu || !menuRef.current) return;
-    const rect = menuRef.current.getBoundingClientRect();
-    setDropUp(rect.bottom + 200 > window.innerHeight - 16);
-    setAlignLeft(rect.left - 176 < 8);
+    const closeAll = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target) && 
+          buttonRef.current && !buttonRef.current.contains(e.target)) {
+        setShowMenu(false);
+        setShowFullPicker(false);
+      }
+    };
+    if (showMenu) document.addEventListener('mousedown', closeAll);
+    return () => document.removeEventListener('mousedown', closeAll);
   }, [showMenu]);
 
+  // Position Logic
   useEffect(() => {
-    const close = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) setShowMenu(false);
-    };
-    document.addEventListener('mousedown', close);
-    document.addEventListener('touchstart', close);
-    return () => {
-      document.removeEventListener('mousedown', close);
-      document.removeEventListener('touchstart', close);
-    };
-  }, []);
-
-  const handleShare = async () => {
-    setShowMenu(false);
-    const text = message?.content || '';
-    try {
-      if (navigator.share) await navigator.share({ text });
-      else await navigator.clipboard.writeText(text);
-    } catch (err) {
-      console.error('Share error:', err);
+    if (showMenu && menuRef.current) {
+      const rect = menuRef.current.getBoundingClientRect();
+      setDropUp(window.innerHeight - rect.bottom < (showFullPicker ? 450 : 250));
     }
-    onShare?.();
+  }, [showMenu, showFullPicker]);
+
+  const handleEmojiSelect = (emojiData) => {
+    onReaction?.(emojiData.emoji || emojiData);
+    setShowMenu(false);
+    setShowFullPicker(false);
   };
 
-  if (!isOwn) return null;
-
   return (
-    <div className="relative inline-block" ref={menuRef}>
+    <div className="relative group flex items-center">
+      {/* 3-Dot Button: Message ke side mein show hoga center par */}
       <button
-        onClick={() => setShowMenu((v) => !v)}
-        className={`p-1.5 rounded-xl transition-all duration-150 outline-none active:scale-90 ${
-          showMenu
-            ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400'
-            : 'text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-600 dark:hover:text-gray-300'
-        }`}
-        aria-label="Message actions"
-        aria-expanded={showMenu}
+        ref={buttonRef}
+        onClick={(e) => { e.stopPropagation(); setShowMenu(!showMenu); }}
+        className={`absolute z-20 p-1 rounded-full bg-white dark:bg-gray-800 shadow-md border border-gray-100 dark:border-gray-700 text-gray-400 hover:text-blue-500 transition-all opacity-0 group-hover:opacity-100 ${
+          showMenu ? 'opacity-100 rotate-90 scale-110' : ''
+        } ${isOwn ? '-left-8' : '-right-8'}`}
       >
-        <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24">
-          <circle cx="12" cy="5" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="12" cy="19" r="2" />
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+          <circle cx="12" cy="12" r="1" /><circle cx="12" cy="5" r="1" /><circle cx="12" cy="19" r="1" />
         </svg>
       </button>
 
+      {/* Message Content */}
+      {children}
+
+      {/* Dropdown Menu */}
       {showMenu && (
-        <div className={[
-          'absolute z-50 w-44',
-          'bg-white dark:bg-gray-900',
-          'rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-800',
-          'py-1.5 overflow-hidden',
-          dropUp ? 'bottom-full mb-2' : 'top-full mt-2',
-          alignLeft ? 'left-0' : 'right-0',
-        ].join(' ')}>
+        <div
+          ref={menuRef}
+          className={`absolute z-[100] min-w-[240px] transition-all duration-200 ${
+            dropUp ? 'bottom-full mb-2' : 'top-full mt-2'
+          } ${isOwn ? 'right-0' : 'left-0'}`}
+        >
+          {!showFullPicker ? (
+            <div className="bg-white dark:bg-gray-900 shadow-2xl rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+              {/* Quick Emojis */}
+              <div className="flex items-center justify-between p-2.5 bg-gray-50 dark:bg-white/5 border-b dark:border-gray-800">
+                {quickEmojis.map((emoji) => (
+                  <button key={emoji} onClick={() => handleEmojiSelect(emoji)} className="text-2xl hover:scale-125 transition-transform active:scale-90">{emoji}</button>
+                ))}
+                <button onClick={() => setShowFullPicker(true)} className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xl hover:bg-blue-500 hover:text-white transition-colors">+</button>
+              </div>
 
-          <div className="px-3 pt-1.5 pb-2">
-            <p className="text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Actions</p>
-          </div>
-
-          {/* Edit */}
-          <button
-            onClick={() => { onEdit(); setShowMenu(false); }}
-            className="w-[calc(100%-8px)] mx-1 text-left px-3 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 rounded-xl transition-all duration-150 flex items-center gap-2.5"
-          >
-            <span className="w-7 h-7 rounded-lg bg-gray-50 dark:bg-gray-800 flex items-center justify-center flex-shrink-0">
-              <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" strokeLinecap="round" strokeLinejoin="round" /></svg>
-            </span>
-            Edit
-          </button>
-
-          {/* Share/Copy */}
-          <button
-            onClick={handleShare}
-            className="w-[calc(100%-8px)] mx-1 text-left px-3 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400 rounded-xl transition-all duration-150 flex items-center gap-2.5"
-          >
-            <span className="w-7 h-7 rounded-lg bg-gray-50 dark:bg-gray-800 flex items-center justify-center flex-shrink-0">
-              <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
-            </span>
-            Copy
-          </button>
-
-          <div className="h-px bg-gray-100 dark:bg-gray-800 mx-3 my-1" />
-
-          {/* Delete */}
-          <button
-            onClick={() => { onDelete(); setShowMenu(false); }}
-            className="w-[calc(100%-8px)] mx-1 text-left px-3 py-2 text-sm font-semibold text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all duration-150 flex items-center gap-2.5"
-          >
-            <span className="w-7 h-7 rounded-lg bg-red-50 dark:bg-red-900/20 flex items-center justify-center flex-shrink-0">
-              <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" strokeLinecap="round" strokeLinejoin="round" /></svg>
-            </span>
-            Delete
-          </button>
+              {/* Actions */}
+              <div className="p-1.5 space-y-0.5">
+                <button onClick={() => { navigator.clipboard.writeText(message?.content); setShowMenu(false); }} className="w-full text-left px-4 py-2 text-sm font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl">Copy</button>
+                {isOwn && (
+                  <>
+                    <button onClick={() => { onEdit(); setShowMenu(false); }} className="w-full text-left px-4 py-2 text-sm font-semibold text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl">Edit</button>
+                    <div className="h-px bg-gray-100 dark:border-gray-800 my-1 mx-2" />
+                    <button onClick={() => { onDelete(); setShowMenu(false); }} className="w-full text-left px-4 py-2 text-sm font-semibold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl">Delete</button>
+                  </>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="shadow-2xl rounded-2xl overflow-hidden border dark:border-gray-700">
+              <EmojiPicker onEmojiClick={handleEmojiSelect} theme="auto" width={300} height={400} skinTonesDisabled={true} searchDisabled={false} />
+            </div>
+          )}
         </div>
       )}
     </div>
   );
-};
+});
 
 export default MessageActions;
